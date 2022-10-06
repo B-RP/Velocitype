@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'data.dart';
+import 'menu.dart';
 
 void main() {
+  print("Testing back end");
+  print(Data.testInt);
   runApp(const MyApp());
 }
 
@@ -139,27 +143,4 @@ class _TimerState extends State<Timer> {
       ),
     );
   }
-}
-
-class Menu extends StatelessWidget {
-  const Menu(BuildContext context, {super.key});
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      content: Center(
-          //widthFactor: 1000,
-          child: TextButton(
-        onPressed: () {
-          Navigator.of(context).pop();
-        },
-        child: const Text(
-          'Close menu',
-        ),
-      )),
-    );
-  }
-}
-
-class Data {
-  static int testInt = 0;
 }
