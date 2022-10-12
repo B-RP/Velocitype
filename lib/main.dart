@@ -3,8 +3,9 @@ import 'data.dart';
 import 'menu.dart';
 
 void main() {
-  print("Testing back end");
-  print(Data.testInt);
+  //print("Testing back end");
+  //print(Data.testInt);
+  Data.fillList();
   runApp(const MyApp());
 }
 
