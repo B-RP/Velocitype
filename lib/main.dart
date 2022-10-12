@@ -1,3 +1,5 @@
+//import 'dart:html';
+
 import 'package:flutter/material.dart';
 import 'data.dart';
 import 'menu.dart';
@@ -25,6 +27,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
+//Main application
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
   @override
@@ -32,9 +35,6 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  //backend code here
-  //add responsive padding?
-
   @override
   Widget build(BuildContext context) {
     //double appWidth = MediaQuery.of(context).size.width;
@@ -58,70 +58,13 @@ class _MainPageState extends State<MainPage> {
                         padding: EdgeInsets.fromLTRB(0, 20, 0, 10),
                         child: Timer(),
                       ),
-                      const Text(
-                        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt',
-                        style: TextStyle(
-                          fontSize: 25,
-                          color: Colors.white,
-                        ),
-                      ),
                       Padding(
                         padding: const EdgeInsets.fromLTRB(0, 20, 0, 10),
-                        child: Row(children: <Widget>[
-                          Expanded(
-                              child: TextField(
-                                  onChanged: (text) {
-                                    if (text[text.length - 1] == " ") {
-                                      textFieldController.clear();
-                                    }
-                                    //print(text);
-                                  },
-                                  style: const TextStyle(color: Colors.white),
-                                  decoration: const InputDecoration(
-                                      border: OutlineInputBorder(),
-                                      hintText: "Type to begin test"),
-                                  controller: textFieldController)),
-                          IconButton(
-                              iconSize: 40,
-                              icon: const Icon(Icons.refresh),
-                              onPressed: () {
-                                //print("refresh pressed");
-                              },
-                              style: IconButton.styleFrom(
-                                foregroundColor: Colors.white,
-                                backgroundColor: Colors.transparent,
-                                disabledBackgroundColor: Colors.white,
-                                hoverColor: Colors.white,
-                                focusColor: Colors.white,
-                                highlightColor: Colors.white,
-                              )),
-                          IconButton(
-                            icon: const Icon(Icons.menu),
-                            onPressed: () {
-                              showGeneralDialog(
-                                context: context,
-                                pageBuilder: (ctx, a1, a2) {
-                                  return Menu(context);
-                                },
-                                transitionBuilder: (context, animation,
-                                    secondaryAnimation, child) {
-                                  const begin = Offset(0.0, 1.0);
-                                  const end = Offset.zero;
-                                  const curve = Curves.ease;
-
-                                  var tween = Tween(begin: begin, end: end)
-                                      .chain(CurveTween(curve: curve));
-
-                                  return SlideTransition(
-                                    position: animation.drive(tween),
-                                    child: child,
-                                  );
-                                },
-                              );
-                            },
-                          ),
-                        ]),
-                      )
+                        child: WordBank(),
+                      ),
+                      Padding(
+                          padding: const EdgeInsets.fromLTRB(0, 20, 0, 10),
+                          child: InteractionRow())
                     ]))));
   }
 }
@@ -142,5 +85,188 @@ class _TimerState extends State<Timer> {
         color: Colors.white,
       ),
     );
+  }
+}
+
+class Word extends StatefulWidget {
+  String s = " ";
+  Word({super.key, required this.s});
+
+  @override
+  // ignore: no_logic_in_create_state
+  State<StatefulWidget> createState() => _WordState(s: s);
+}
+
+class _WordState extends State<Word> {
+  _WordState({
+    required this.s,
+  });
+
+  String s = "";
+  bool focused = false;
+  bool correct = true;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      s,
+      style: TextStyle(
+        fontSize: 20,
+        color: Colors.white,
+        decoration: TextDecoration.underline,
+      ),
+    );
+  }
+}
+
+class WordBank extends StatefulWidget {
+  WordBank({super.key});
+
+  int currentIndex = 0;
+
+  void increaseIndex() {
+    currentIndex++;
+  }
+
+  @override
+  State<StatefulWidget> createState() => _WordBankState();
+}
+
+class _WordBankState extends State<WordBank> {
+  var wordLine1 = [
+    'word1 ',
+    'word2 ',
+    'word3 ',
+    'word4 ',
+    'word5 ',
+    'word6 ',
+    'word7 ',
+    'word8 ',
+    'word9 ',
+    'word10 ',
+    'word11 ',
+    'word12 '
+  ];
+  var wordLine2 = [
+    'word1 ',
+    'word2 ',
+    'word3 ',
+    'word4 ',
+    'word5 ',
+    'word6 ',
+    'word7 ',
+    'word8 ',
+    'word9 ',
+    'word10 ',
+    'word11 ',
+    'word12 '
+  ];
+  @override
+  Widget build(BuildContext context) {
+    return (Column(children: [
+      Row(
+        children: [
+          Word(
+            s: wordLine1[0],
+          ),
+          Word(
+            s: wordLine1[1],
+          ),
+          Word(
+            s: wordLine1[2],
+          ),
+          Word(
+            s: wordLine1[3],
+          ),
+          Word(
+            s: wordLine1[4],
+          ),
+          Word(
+            s: wordLine1[5],
+          ),
+          Word(
+            s: wordLine1[6],
+          ),
+          Word(
+            s: wordLine1[7],
+          ),
+          Word(
+            s: wordLine1[8],
+          ),
+          Word(
+            s: wordLine1[9],
+          ),
+          Word(
+            s: wordLine1[10],
+          ),
+          Word(
+            s: wordLine1[11],
+          )
+        ],
+      ),
+      Row(
+        children: [
+          //words
+        ],
+      )
+    ]));
+  }
+}
+
+class InteractionRow extends StatelessWidget {
+  final textFieldController = TextEditingController();
+
+  InteractionRow({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Row(children: <Widget>[
+      Expanded(
+          child: TextField(
+              onChanged: (text) {
+                if (text[text.length - 1] == " ") {
+                  textFieldController.clear();
+                }
+              },
+              style: const TextStyle(color: Colors.white),
+              decoration: const InputDecoration(
+                  border: OutlineInputBorder(), hintText: "Type to begin test"),
+              controller: textFieldController)),
+      IconButton(
+          iconSize: 40,
+          icon: const Icon(Icons.refresh),
+          onPressed: () {},
+          style: IconButton.styleFrom(
+            foregroundColor: Colors.white,
+            backgroundColor: Colors.transparent,
+            disabledBackgroundColor: Colors.white,
+            hoverColor: Colors.white,
+            focusColor: Colors.white,
+            highlightColor: Colors.white,
+          )),
+      IconButton(
+        icon: const Icon(Icons.menu),
+        onPressed: () {
+          showGeneralDialog(
+            context: context,
+            pageBuilder: (ctx, a1, a2) {
+              return Menu(context);
+            },
+            transitionBuilder: (context, animation, secondaryAnimation, child) {
+              const begin = Offset(0.0, 1.0);
+              const end = Offset.zero;
+              const curve = Curves.ease;
+
+              var tween =
+                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+              return SlideTransition(
+                position: animation.drive(tween),
+                child: child,
+              );
+            },
+          );
+        },
+      ),
+    ]);
   }
 }
