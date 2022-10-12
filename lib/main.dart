@@ -7,7 +7,6 @@ import 'menu.dart';
 void main() {
   //print("Testing back end");
   //print(Data.testInt);
-  Data.fillList();
   runApp(const MyApp());
 }
 
@@ -134,34 +133,8 @@ class WordBank extends StatefulWidget {
 }
 
 class _WordBankState extends State<WordBank> {
-  var wordLine1 = [
-    'word1 ',
-    'word2 ',
-    'word3 ',
-    'word4 ',
-    'word5 ',
-    'word6 ',
-    'word7 ',
-    'word8 ',
-    'word9 ',
-    'word10 ',
-    'word11 ',
-    'word12 '
-  ];
-  var wordLine2 = [
-    'word1 ',
-    'word2 ',
-    'word3 ',
-    'word4 ',
-    'word5 ',
-    'word6 ',
-    'word7 ',
-    'word8 ',
-    'word9 ',
-    'word10 ',
-    'word11 ',
-    'word12 '
-  ];
+  var wordLine1 = Data.fillList();
+  var wordLine2 = Data.fillList();
   @override
   Widget build(BuildContext context) {
     return (Column(children: [
@@ -207,7 +180,42 @@ class _WordBankState extends State<WordBank> {
       ),
       Row(
         children: [
-          //words
+          Word(
+            s: wordLine2[0],
+          ),
+          Word(
+            s: wordLine2[1],
+          ),
+          Word(
+            s: wordLine2[2],
+          ),
+          Word(
+            s: wordLine2[3],
+          ),
+          Word(
+            s: wordLine2[4],
+          ),
+          Word(
+            s: wordLine2[5],
+          ),
+          Word(
+            s: wordLine2[6],
+          ),
+          Word(
+            s: wordLine2[7],
+          ),
+          Word(
+            s: wordLine2[8],
+          ),
+          Word(
+            s: wordLine2[9],
+          ),
+          Word(
+            s: wordLine2[10],
+          ),
+          Word(
+            s: wordLine2[11],
+          )
         ],
       )
     ]));
