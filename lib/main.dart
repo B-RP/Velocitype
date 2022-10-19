@@ -1,5 +1,7 @@
 //import 'dart:html';
 
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import 'data.dart';
 import 'menu.dart';
@@ -35,10 +37,11 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
+  final GlobalKey<_WordBankState> _wordKey = GlobalKey();
+
   @override
   Widget build(BuildContext context) {
     //double appWidth = MediaQuery.of(context).size.width;
-    final textFieldController = TextEditingController();
     return Scaffold(
         body: Container(
             decoration: BoxDecoration(
@@ -60,11 +63,18 @@ class _MainPageState extends State<MainPage> {
                       ),
                       Padding(
                         padding: const EdgeInsets.fromLTRB(0, 20, 0, 10),
-                        child: WordBank(),
+                        child: WordBank(
+                          key: _wordKey,
+                        ),
                       ),
                       Padding(
                           padding: const EdgeInsets.fromLTRB(0, 20, 0, 10),
-                          child: InteractionRow())
+                          child: InteractionRow(
+                            checkIndex: () {
+                              print("activated");
+                              _wordKey.currentState?.moveToNextWord();
+                            },
+                          ))
                     ]))));
   }
 }
@@ -98,84 +108,120 @@ class Word extends StatefulWidget {
 }
 
 class _WordState extends State<Word> {
+  void testCommunication() {
+    print("activated in word");
+  }
+
   _WordState({
     required this.s,
   });
 
+  void underLine() {
+    setState(() {
+      wordStyle = TextStyle(
+          fontSize: 25,
+          color: Colors.white,
+          decoration: TextDecoration.underline);
+    });
+  }
+
+  void removeUnderline() {
+    setState(() {
+      wordStyle = TextStyle(
+        fontSize: 25,
+        color: Colors.white,
+      );
+    });
+  }
+
   String s = "";
-  bool focused = false;
-  bool correct = true;
+
+  TextStyle wordStyle = TextStyle(
+    fontSize: 25,
+    color: Colors.white,
+  );
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      s,
-      style: TextStyle(
-        fontSize: 20,
-        color: Colors.white,
-        decoration: TextDecoration.underline,
-      ),
-    );
+    return Text(s, style: wordStyle);
   }
 }
 
 class WordBank extends StatefulWidget {
-  WordBank({super.key});
-
-  int currentIndex = 0;
-
-  void increaseIndex() {
-    currentIndex++;
-  }
+  const WordBank({super.key});
 
   @override
   State<StatefulWidget> createState() => _WordBankState();
 }
 
 class _WordBankState extends State<WordBank> {
+  // ignore: prefer_final_fields
+  List<GlobalKey<_WordState>> _wordKeys = [
+    GlobalKey<_WordState>(),
+    GlobalKey<_WordState>(),
+    GlobalKey<_WordState>(),
+    GlobalKey<_WordState>(),
+    GlobalKey<_WordState>(),
+    GlobalKey<_WordState>(),
+    GlobalKey<_WordState>(),
+    GlobalKey<_WordState>(),
+    GlobalKey<_WordState>(),
+    GlobalKey<_WordState>(),
+    GlobalKey<_WordState>(),
+    GlobalKey<_WordState>(),
+  ];
+
+  int currentWord = 0;
+
+  void moveToNextWord() {
+    print("activated in word bank");
+    _wordKeys[currentWord].currentState?.removeUnderline();
+    if (currentWord < 11) {
+      _wordKeys[currentWord + 1].currentState?.underLine();
+    }
+
+    if (currentWord == 11) {
+      currentWord = 0;
+      selectFirst();
+      refresh();
+    } else {
+      currentWord++;
+    }
+  }
+
+  void selectFirst() {
+    _wordKeys[0].currentState?.underLine();
+    _wordKeys[11].currentState?.removeUnderline();
+  }
+
   var wordLine1 = Data.fillList();
   var wordLine2 = Data.fillList();
+
+  void refresh() {
+    setState(() {
+      wordLine1 = wordLine2;
+      wordLine2 = Data.fillList();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return (Column(children: [
       Row(
         children: [
-          Word(
-            s: wordLine1[0],
-          ),
-          Word(
-            s: wordLine1[1],
-          ),
-          Word(
-            s: wordLine1[2],
-          ),
-          Word(
-            s: wordLine1[3],
-          ),
-          Word(
-            s: wordLine1[4],
-          ),
-          Word(
-            s: wordLine1[5],
-          ),
-          Word(
-            s: wordLine1[6],
-          ),
-          Word(
-            s: wordLine1[7],
-          ),
-          Word(
-            s: wordLine1[8],
-          ),
-          Word(
-            s: wordLine1[9],
-          ),
-          Word(
-            s: wordLine1[10],
-          ),
-          Word(
-            s: wordLine1[11],
-          )
+          //Expanded(child: Word(s: wordLine1[0], key: _wordKeys[0])),
+          Word(s: wordLine1[0], key: _wordKeys[0]),
+          Word(s: wordLine1[1], key: _wordKeys[1]),
+          Word(s: wordLine1[2], key: _wordKeys[2]),
+          Word(s: wordLine1[3], key: _wordKeys[3]),
+          Word(s: wordLine1[4], key: _wordKeys[4]),
+          Word(s: wordLine1[5], key: _wordKeys[5]),
+          Word(s: wordLine1[6], key: _wordKeys[6]),
+          Word(s: wordLine1[7], key: _wordKeys[7]),
+          Word(s: wordLine1[8], key: _wordKeys[8]),
+          Word(s: wordLine1[9], key: _wordKeys[9]),
+          Word(s: wordLine1[10], key: _wordKeys[10]),
+          Word(s: wordLine1[11], key: _wordKeys[11])
         ],
       ),
       Row(
@@ -225,7 +271,9 @@ class _WordBankState extends State<WordBank> {
 class InteractionRow extends StatelessWidget {
   final textFieldController = TextEditingController();
 
-  InteractionRow({super.key});
+  final VoidCallback checkIndex;
+
+  InteractionRow({super.key, required this.checkIndex});
   @override
   Widget build(BuildContext context) {
     return Row(children: <Widget>[
@@ -234,6 +282,8 @@ class InteractionRow extends StatelessWidget {
               onChanged: (text) {
                 if (text[text.length - 1] == " ") {
                   textFieldController.clear();
+                  checkIndex();
+                  Data.currentIndex++;
                 }
               },
               style: const TextStyle(color: Colors.white),

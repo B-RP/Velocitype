@@ -4,7 +4,8 @@ import 'dart:math';
 import 'package:tempo_application/main.dart';
 
 class Data {
-  static int testInt = 0;
+  static int currentIndex = 0;
+
   int totalWords = 0;
   int totalIncWords = 0;
   int totalKeys = 0;
