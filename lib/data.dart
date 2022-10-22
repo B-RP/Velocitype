@@ -6,10 +6,28 @@ import 'package:tempo_application/main.dart';
 class Data {
   static int currentIndex = 0;
 
-  int totalWords = 0;
-  int totalIncWords = 0;
-  int totalKeys = 0;
-  int totalIncKeys = 0;
+  int totalWords = 10;
+  int totalIncWords = 4;
+  int totalKeys = 50;
+  int totalIncKeys = 12;
+
+  double calcWordAccuracy() {
+    var correctWords = totalWords - totalIncWords;
+    var wordAccuracy = correctWords / totalWords;
+
+    return wordAccuracy * 100;
+  }
+
+  double calcKeyAccuracy() {
+    var correctKeys = totalKeys - totalIncKeys;
+    var keyAccuracy = correctKeys / totalKeys;
+
+    return keyAccuracy * 100;
+  }
+
+  //int calcWPM() {
+
+  //}
 
   static var wordList = [
     "the",
@@ -987,7 +1005,7 @@ class Data {
     "cash",
     "employment"
   ];
-
+  //This function will fill a list of size 12 with random words from the list above
   static List fillList() {
     var rng = Random();
 
