@@ -6,10 +6,10 @@ import 'package:tempo_application/main.dart';
 class Data {
   static int currentIndex = 0;
 
-  int totalWords = 10;
-  int totalIncWords = 4;
-  int totalKeys = 50;
-  int totalIncKeys = 12;
+  int totalWords = 0;
+  int totalIncWords = 0;
+  int totalKeys = 0;
+  int totalIncKeys = 0;
 
   double calcWordAccuracy() {
     var correctWords = totalWords - totalIncWords;
@@ -25,9 +25,10 @@ class Data {
     return keyAccuracy * 100;
   }
 
-  //int calcWPM() {
-
-  //}
+  double calcWPM(double timer) {
+    var wpm = totalWords / timer;
+    return wpm;
+  }
 
   static var wordList = [
     "the",
