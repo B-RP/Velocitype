@@ -3,8 +3,11 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
+
 import 'data.dart';
 import 'menu.dart';
+
+import 'dart:async';
 
 void main() {
   //print("Testing back end");
@@ -42,6 +45,7 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     //double appWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
         body: Container(
             decoration: BoxDecoration(
@@ -59,7 +63,7 @@ class _MainPageState extends State<MainPage> {
                     children: <Widget>[
                       const Padding(
                         padding: EdgeInsets.fromLTRB(0, 20, 0, 10),
-                        child: Timer(),
+                        child: CountdownTimer(),
                       ),
                       Padding(
                         padding: const EdgeInsets.fromLTRB(0, 20, 0, 10),
@@ -71,7 +75,6 @@ class _MainPageState extends State<MainPage> {
                           padding: const EdgeInsets.fromLTRB(0, 20, 0, 10),
                           child: InteractionRow(
                             checkIndex: () {
-                              print("activated");
                               _wordKey.currentState?.moveToNextWord();
                             },
                           ))
@@ -79,17 +82,54 @@ class _MainPageState extends State<MainPage> {
   }
 }
 
-class Timer extends StatefulWidget {
-  const Timer({super.key});
+class CountdownTimer extends StatefulWidget {
+  const CountdownTimer({super.key});
   @override
-  State<Timer> createState() => _TimerState();
+  State<CountdownTimer> createState() => _CountdownTimerState();
 }
 
-class _TimerState extends State<Timer> {
+class _CountdownTimerState extends State<CountdownTimer> {
+  Timer? countdownTimer;
+  Duration testDuration = Duration(minutes: 1);
+
   @override
+  void initState() {
+    super.initState();
+  }
+
+  void startTimer() {
+    Timer.periodic(Duration(seconds: 1), (_) => setCountDown());
+  }
+
+  void stopTimer() {
+    setState(() => countdownTimer!.cancel());
+  }
+
+  void resetTimer() {
+    stopTimer();
+    setState(() => testDuration = Duration(days: 5));
+  }
+
+  void setCountDown() {
+    final reduceSecondsBy = 1;
+
+    setState(() {
+      final seconds = testDuration.inSeconds - reduceSecondsBy;
+      if (seconds < 0) {
+        countdownTimer!.cancel();
+      } else {
+        testDuration = Duration(seconds: seconds);
+      }
+    });
+  }
+
   Widget build(BuildContext context) {
-    return const Text(
-      "0:40",
+    String strDigits(int n) => n.toString().padLeft(2, '0');
+    final minutes = strDigits(testDuration.inMinutes.remainder(60));
+    final seconds = strDigits(testDuration.inSeconds.remainder(60));
+
+    return Text(
+      '$minutes:$seconds',
       style: TextStyle(
         fontSize: 40,
         color: Colors.white,
@@ -108,13 +148,15 @@ class Word extends StatefulWidget {
 }
 
 class _WordState extends State<Word> {
-  void testCommunication() {
-    print("activated in word");
-  }
-
   _WordState({
     required this.s,
   });
+
+  void changeWord(String s) {
+    setState(() {
+      this.s = s;
+    });
+  }
 
   void underLine() {
     setState(() {
@@ -155,8 +197,22 @@ class WordBank extends StatefulWidget {
 }
 
 class _WordBankState extends State<WordBank> {
-  // ignore: prefer_final_fields
-  List<GlobalKey<_WordState>> _wordKeys = [
+  final List<GlobalKey<_WordState>> _wordKeys = [
+    GlobalKey<_WordState>(),
+    GlobalKey<_WordState>(),
+    GlobalKey<_WordState>(),
+    GlobalKey<_WordState>(),
+    GlobalKey<_WordState>(),
+    GlobalKey<_WordState>(),
+    GlobalKey<_WordState>(),
+    GlobalKey<_WordState>(),
+    GlobalKey<_WordState>(),
+    GlobalKey<_WordState>(),
+    GlobalKey<_WordState>(),
+    GlobalKey<_WordState>(),
+  ];
+
+  final List<GlobalKey<_WordState>> _wordKeys2 = [
     GlobalKey<_WordState>(),
     GlobalKey<_WordState>(),
     GlobalKey<_WordState>(),
@@ -198,14 +254,18 @@ class _WordBankState extends State<WordBank> {
   var wordLine2 = Data.fillList();
 
   void refresh() {
-    setState(() {
-      wordLine1 = wordLine2;
-      wordLine2 = Data.fillList();
-    });
+    wordLine1 = wordLine2;
+    wordLine2 = Data.fillList();
+
+    for (int i = 0; i < _wordKeys.length; i++) {
+      _wordKeys[i].currentState?.changeWord(wordLine1[i]);
+      _wordKeys2[i].currentState?.changeWord(wordLine2[i]);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    selectFirst();
     return (Column(children: [
       Row(
         children: [
@@ -226,42 +286,18 @@ class _WordBankState extends State<WordBank> {
       ),
       Row(
         children: [
-          Word(
-            s: wordLine2[0],
-          ),
-          Word(
-            s: wordLine2[1],
-          ),
-          Word(
-            s: wordLine2[2],
-          ),
-          Word(
-            s: wordLine2[3],
-          ),
-          Word(
-            s: wordLine2[4],
-          ),
-          Word(
-            s: wordLine2[5],
-          ),
-          Word(
-            s: wordLine2[6],
-          ),
-          Word(
-            s: wordLine2[7],
-          ),
-          Word(
-            s: wordLine2[8],
-          ),
-          Word(
-            s: wordLine2[9],
-          ),
-          Word(
-            s: wordLine2[10],
-          ),
-          Word(
-            s: wordLine2[11],
-          )
+          Word(s: wordLine2[0], key: _wordKeys2[0]),
+          Word(s: wordLine2[1], key: _wordKeys2[1]),
+          Word(s: wordLine2[2], key: _wordKeys2[2]),
+          Word(s: wordLine2[3], key: _wordKeys2[3]),
+          Word(s: wordLine2[4], key: _wordKeys2[4]),
+          Word(s: wordLine2[5], key: _wordKeys2[5]),
+          Word(s: wordLine2[6], key: _wordKeys2[6]),
+          Word(s: wordLine2[7], key: _wordKeys2[7]),
+          Word(s: wordLine2[8], key: _wordKeys2[8]),
+          Word(s: wordLine2[9], key: _wordKeys2[9]),
+          Word(s: wordLine2[10], key: _wordKeys2[10]),
+          Word(s: wordLine2[11], key: _wordKeys2[11])
         ],
       )
     ]));
