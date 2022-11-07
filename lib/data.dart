@@ -11,6 +11,25 @@ class Data {
   int totalKeys = 0;
   int totalIncKeys = 0;
 
+  double calcWordAccuracy() {
+    var correctWords = totalWords - totalIncWords;
+    var wordAccuracy = correctWords / totalWords;
+
+    return wordAccuracy * 100;
+  }
+
+  double calcKeyAccuracy() {
+    var correctKeys = totalKeys - totalIncKeys;
+    var keyAccuracy = correctKeys / totalKeys;
+
+    return keyAccuracy * 100;
+  }
+
+  double calcWPM(double timer) {
+    var wpm = totalWords / timer;
+    return wpm;
+  }
+
   static var wordList = [
     "the",
     "of",
@@ -964,7 +983,7 @@ class Data {
     "cash",
     "employment"
   ];
-
+  //This function will fill a list of size 12 with random words from the list above
   static List fillList() {
     var rng = Random();
 
