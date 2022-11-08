@@ -1,13 +1,10 @@
 //import 'dart:html';
 
-// ignore_for_file: prefer_const_constructors
-
 import 'package:flutter/material.dart';
-
+import 'package:get/get.dart';
+import 'checkWords.dart';
 import 'data.dart';
 import 'menu.dart';
-
-import 'dart:async';
 
 void main() {
   //print("Testing back end");
@@ -21,7 +18,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
         title: 'Flutter Demo',
         theme: ThemeData(
             primaryColor: Colors.redAccent, primaryColorDark: Colors.red
@@ -40,13 +37,13 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  final GlobalKey<_WordBankState> _wordKey = GlobalKey();
-
   @override
   Widget build(BuildContext context) {
     //double appWidth = MediaQuery.of(context).size.width;
-
+    final textFieldController = TextEditingController();
     return Scaffold(
+        resizeToAvoidBottomInset:
+            false, // Added - When we open the keyboard for typing this line will help us to not distort the UI
         body: Container(
             decoration: BoxDecoration(
                 image: DecorationImage(
@@ -57,79 +54,37 @@ class _MainPageState extends State<MainPage> {
                       "assets/images/background.png",
                     ))),
             child: Padding(
-                padding: const EdgeInsets.all(100),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 20, horizontal: 20.0),
                 child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       const Padding(
                         padding: EdgeInsets.fromLTRB(0, 20, 0, 10),
-                        child: CountdownTimer(),
+                        child: Timer(),
                       ),
                       Padding(
                         padding: const EdgeInsets.fromLTRB(0, 20, 0, 10),
-                        child: WordBank(
-                          key: _wordKey,
-                        ),
+                        child: WordBank(),
                       ),
                       Padding(
                           padding: const EdgeInsets.fromLTRB(0, 20, 0, 10),
-                          child: InteractionRow(
-                            checkIndex: () {
-                              _wordKey.currentState?.moveToNextWord();
-                            },
-                          ))
+                          child: InteractionRow())
                     ]))));
   }
 }
 
-class CountdownTimer extends StatefulWidget {
-  const CountdownTimer({super.key});
+class Timer extends StatefulWidget {
+  const Timer({super.key});
   @override
-  State<CountdownTimer> createState() => _CountdownTimerState();
+  State<Timer> createState() => _TimerState();
 }
 
-class _CountdownTimerState extends State<CountdownTimer> {
-  Timer? countdownTimer;
-  Duration testDuration = Duration(minutes: 1);
-
+class _TimerState extends State<Timer> {
   @override
-  void initState() {
-    super.initState();
-  }
-
-  void startTimer() {
-    Timer.periodic(Duration(seconds: 1), (_) => setCountDown());
-  }
-
-  void stopTimer() {
-    setState(() => countdownTimer!.cancel());
-  }
-
-  void resetTimer() {
-    stopTimer();
-    setState(() => testDuration = Duration(days: 5));
-  }
-
-  void setCountDown() {
-    final reduceSecondsBy = 1;
-
-    setState(() {
-      final seconds = testDuration.inSeconds - reduceSecondsBy;
-      if (seconds < 0) {
-        countdownTimer!.cancel();
-      } else {
-        testDuration = Duration(seconds: seconds);
-      }
-    });
-  }
-
   Widget build(BuildContext context) {
-    String strDigits(int n) => n.toString().padLeft(2, '0');
-    final minutes = strDigits(testDuration.inMinutes.remainder(60));
-    final seconds = strDigits(testDuration.inSeconds.remainder(60));
-
-    return Text(
-      '$minutes:$seconds',
+    return const Text(
+      "0:40",
       style: TextStyle(
         fontSize: 40,
         color: Colors.white,
@@ -140,7 +95,9 @@ class _CountdownTimerState extends State<CountdownTimer> {
 
 class Word extends StatefulWidget {
   String s = " ";
-  Word({super.key, required this.s});
+  Color
+      color; // This color handles the color of text showing on the screen, all text will show in blue color and the word which we have to spell will show in white color
+  Word({super.key, required this.s, required this.color});
 
   @override
   // ignore: no_logic_in_create_state
@@ -152,216 +109,155 @@ class _WordState extends State<Word> {
     required this.s,
   });
 
-  void changeWord(String s) {
-    setState(() {
-      this.s = s;
-    });
-  }
-
-  void underLine() {
-    setState(() {
-      wordStyle = TextStyle(
-          fontSize: 25,
-          color: Colors.white,
-          decoration: TextDecoration.underline);
-    });
-  }
-
-  void removeUnderline() {
-    setState(() {
-      wordStyle = TextStyle(
-        fontSize: 25,
-        color: Colors.white,
-      );
-    });
-  }
-
   String s = "";
-
-  TextStyle wordStyle = TextStyle(
-    fontSize: 25,
-    color: Colors.white,
-  );
+  bool focused = false;
+  bool correct = true;
 
   @override
   Widget build(BuildContext context) {
-    return Text(s, style: wordStyle);
+    return Text(
+      s,
+      style: TextStyle(
+        fontSize: 20,
+        color: widget.color, // changed
+        decoration: TextDecoration.underline,
+      ),
+    );
   }
 }
 
 class WordBank extends StatefulWidget {
-  const WordBank({super.key});
+  WordBank({super.key});
+
+  int currentIndex =
+      0; // This the the index of the word which we are currently answering
+
+  // When we type the spelling and add space then the current index will increment one and then next word will select
+  void increaseIndex() {
+    currentIndex++;
+  }
 
   @override
   State<StatefulWidget> createState() => _WordBankState();
 }
 
 class _WordBankState extends State<WordBank> {
-  final List<GlobalKey<_WordState>> _wordKeys = [
-    GlobalKey<_WordState>(),
-    GlobalKey<_WordState>(),
-    GlobalKey<_WordState>(),
-    GlobalKey<_WordState>(),
-    GlobalKey<_WordState>(),
-    GlobalKey<_WordState>(),
-    GlobalKey<_WordState>(),
-    GlobalKey<_WordState>(),
-    GlobalKey<_WordState>(),
-    GlobalKey<_WordState>(),
-    GlobalKey<_WordState>(),
-    GlobalKey<_WordState>(),
-  ];
-
-  final List<GlobalKey<_WordState>> _wordKeys2 = [
-    GlobalKey<_WordState>(),
-    GlobalKey<_WordState>(),
-    GlobalKey<_WordState>(),
-    GlobalKey<_WordState>(),
-    GlobalKey<_WordState>(),
-    GlobalKey<_WordState>(),
-    GlobalKey<_WordState>(),
-    GlobalKey<_WordState>(),
-    GlobalKey<_WordState>(),
-    GlobalKey<_WordState>(),
-    GlobalKey<_WordState>(),
-    GlobalKey<_WordState>(),
-  ];
-
-  int currentWord = 0;
-
-  void moveToNextWord() {
-    print("activated in word bank");
-    _wordKeys[currentWord].currentState?.removeUnderline();
-    if (currentWord < 11) {
-      _wordKeys[currentWord + 1].currentState?.underLine();
-    }
-
-    if (currentWord == 11) {
-      currentWord = 0;
-      selectFirst();
-      refresh();
-    } else {
-      currentWord++;
-    }
-  }
-
-  void selectFirst() {
-    _wordKeys[0].currentState?.underLine();
-    _wordKeys[11].currentState?.removeUnderline();
-  }
-
-  var wordLine1 = Data.fillList();
-  var wordLine2 = Data.fillList();
-
-  void refresh() {
-    wordLine1 = wordLine2;
-    wordLine2 = Data.fillList();
-
-    for (int i = 0; i < _wordKeys.length; i++) {
-      _wordKeys[i].currentState?.changeWord(wordLine1[i]);
-      _wordKeys2[i].currentState?.changeWord(wordLine2[i]);
-    }
-  }
+  final WordsController _wordsController = Get.put(WordsController());
 
   @override
   Widget build(BuildContext context) {
-    selectFirst();
-    return (Column(children: [
-      Row(
-        children: [
-          //Expanded(child: Word(s: wordLine1[0], key: _wordKeys[0])),
-          Word(s: wordLine1[0], key: _wordKeys[0]),
-          Word(s: wordLine1[1], key: _wordKeys[1]),
-          Word(s: wordLine1[2], key: _wordKeys[2]),
-          Word(s: wordLine1[3], key: _wordKeys[3]),
-          Word(s: wordLine1[4], key: _wordKeys[4]),
-          Word(s: wordLine1[5], key: _wordKeys[5]),
-          Word(s: wordLine1[6], key: _wordKeys[6]),
-          Word(s: wordLine1[7], key: _wordKeys[7]),
-          Word(s: wordLine1[8], key: _wordKeys[8]),
-          Word(s: wordLine1[9], key: _wordKeys[9]),
-          Word(s: wordLine1[10], key: _wordKeys[10]),
-          Word(s: wordLine1[11], key: _wordKeys[11])
-        ],
-      ),
-      Row(
-        children: [
-          Word(s: wordLine2[0], key: _wordKeys2[0]),
-          Word(s: wordLine2[1], key: _wordKeys2[1]),
-          Word(s: wordLine2[2], key: _wordKeys2[2]),
-          Word(s: wordLine2[3], key: _wordKeys2[3]),
-          Word(s: wordLine2[4], key: _wordKeys2[4]),
-          Word(s: wordLine2[5], key: _wordKeys2[5]),
-          Word(s: wordLine2[6], key: _wordKeys2[6]),
-          Word(s: wordLine2[7], key: _wordKeys2[7]),
-          Word(s: wordLine2[8], key: _wordKeys2[8]),
-          Word(s: wordLine2[9], key: _wordKeys2[9]),
-          Word(s: wordLine2[10], key: _wordKeys2[10]),
-          Word(s: wordLine2[11], key: _wordKeys2[11])
-        ],
-      )
-    ]));
+    return Container(
+      width: MediaQuery.of(context)
+          .size
+          .width, // I placed a container widget which occupies the width as the screen width, MediaQuery will give us total width of screen
+      child:
+          // We wrap the Column widget with Obx(), which means when value of _wordController changes this Obx widget receives that change and will show the change on the screen with calling setState function
+          (Obx(() => Column(
+                  // Column Widget arrange the widgets column wise
+                  mainAxisAlignment: MainAxisAlignment
+                      .start, // Main Axis Alignment.start means the column will start arranging the widget from start of column
+                  mainAxisSize:
+                      MainAxisSize.max, // Column will occupy the maximum space
+                  children: [
+                    // Wrap widget arranges the widgets row wise if number of widgets increases from line it will move the next widget to next line
+                    Wrap(
+                      children: [
+                        // In the previous code, it was passing the words one by one seprately, to simplify, I used for loop it will call 24 times and show the 24 elements on screen in two lines indexs will start from 0 and end on 23
+                        for (int index = 0; index <= 23; index++) ...[
+                          // Widget that returns the words at index[x]
+                          Word(
+                            s: _wordsController.wordLine1[
+                                index], // Thia means list of words with index will pass as a parameter
+
+                            // if word of current index is the word which we have to answer then that color would be white and color of other words will be blue
+                            color: _wordsController.index.value == index
+                                ? Colors.white
+                                : Colors.blue,
+                          )
+                        ],
+                      ],
+                    ),
+                  ]))),
+    );
   }
 }
 
 class InteractionRow extends StatelessWidget {
   final textFieldController = TextEditingController();
+  final WordsController _wordsController = Get.put(WordsController()); // added
 
-  final VoidCallback checkIndex;
-
-  InteractionRow({super.key, required this.checkIndex});
+  InteractionRow({super.key});
   @override
   Widget build(BuildContext context) {
-    return Row(children: <Widget>[
-      Expanded(
-          child: TextField(
-              onChanged: (text) {
-                if (text[text.length - 1] == " ") {
-                  textFieldController.clear();
-                  checkIndex();
-                  Data.currentIndex++;
-                }
-              },
-              style: const TextStyle(color: Colors.white),
-              decoration: const InputDecoration(
-                  border: OutlineInputBorder(), hintText: "Type to begin test"),
-              controller: textFieldController)),
-      IconButton(
-          iconSize: 40,
-          icon: const Icon(Icons.refresh),
-          onPressed: () {},
-          style: IconButton.styleFrom(
-            foregroundColor: Colors.white,
-            backgroundColor: Colors.transparent,
-            disabledBackgroundColor: Colors.white,
-            hoverColor: Colors.white,
-            focusColor: Colors.white,
-            highlightColor: Colors.white,
-          )),
-      IconButton(
-        icon: const Icon(Icons.menu),
-        onPressed: () {
-          showGeneralDialog(
-            context: context,
-            pageBuilder: (ctx, a1, a2) {
-              return Menu(context);
-            },
-            transitionBuilder: (context, animation, secondaryAnimation, child) {
-              const begin = Offset(0.0, 1.0);
-              const end = Offset.zero;
-              const curve = Curves.ease;
+    return Column(
+      // changed
+      children: [
+        Row(children: <Widget>[
+          Expanded(
+              child: TextField(
+                  onChanged: (text) {
+                    // When user enters space after typing the word then index will increment one and control will shift to next word
+                    if (text[text.length - 1] == " ") {
+                      _wordsController.checkWord(text);
+                      // Text field will be empty then
+                      textFieldController.clear();
+                    }
+                  },
+                  style: const TextStyle(color: Colors.white),
+                  decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      hintText: "Type to begin test"),
+                  controller: textFieldController)),
+          IconButton(
+              iconSize: 40,
+              icon: const Icon(Icons.refresh),
+              onPressed: () {},
+              style: IconButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor: Colors.transparent,
+                disabledBackgroundColor: Colors.white,
+                hoverColor: Colors.white,
+                focusColor: Colors.white,
+                highlightColor: Colors.white,
+              )),
+          IconButton(
+            icon: const Icon(Icons.menu),
+            onPressed: () {
+              showGeneralDialog(
+                context: context,
+                pageBuilder: (ctx, a1, a2) {
+                  return Menu(context);
+                },
+                transitionBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                  const begin = Offset(0.0, 1.0);
+                  const end = Offset.zero;
+                  const curve = Curves.ease;
 
-              var tween =
-                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+                  var tween = Tween(begin: begin, end: end)
+                      .chain(CurveTween(curve: curve));
 
-              return SlideTransition(
-                position: animation.drive(tween),
-                child: child,
+                  return SlideTransition(
+                    position: animation.drive(tween),
+                    child: child,
+                  );
+                },
               );
             },
-          );
-        },
-      ),
-    ]);
+          ),
+        ]), // Added for word score keeping
+        const SizedBox(
+          height: 20.0,
+        ),
+        Obx(() => Center(
+                child: Text(
+              "Score: ${_wordsController.score}/24", // Score total
+              style: TextStyle(color: Colors.white, fontSize: 24),
+            ))),
+        const SizedBox(
+          height: 20.0,
+        ),
+      ],
+    );
   }
 }
