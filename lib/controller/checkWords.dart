@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'data.dart';
+import 'package:tempo_application/data.dart';
 
 class WordsController extends GetxController {
   // Controls the random words, inherits GetxControler class (built in class of Get library)

@@ -4,12 +4,19 @@ import 'dart:math';
 import 'package:tempo_application/main.dart';
 
 class Data {
-  static int currentIndex = 0;
-
+  static int testInt = 0; // Added - Lis
   int totalWords = 0;
   int totalIncWords = 0;
   int totalKeys = 0;
   int totalIncKeys = 0;
+  Data() {
+    // Added - Lis
+    totalWords = 0;
+    totalIncWords = 0;
+    totalKeys = 0;
+    totalIncKeys = 0;
+    testInt = 0;
+  }
 
   double calcWordAccuracy() {
     var correctWords = totalWords - totalIncWords;
@@ -983,15 +990,17 @@ class Data {
     "cash",
     "employment"
   ];
+
   //This function will fill a list of size 12 with random words from the list above
+  // UPDATED
   static List fillList() {
     var rng = Random();
 
-    var wordList2 = new List.filled(12, "");
-    for (int i = 0; i <= 11; i++) {
+    var wordList2 = List.filled(24, "");
+    for (int i = 0; i <= 23; i++) {
       wordList2[i] = "${wordList[rng.nextInt(wordList.length)]} ";
     }
-
+    print(wordList2);
     return wordList2;
   }
 }

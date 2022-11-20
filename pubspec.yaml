@@ -38,6 +38,17 @@ dependencies:
   cupertino_icons: ^1.0.2
   english_words: ^4.0.0
   get: ^4.6.5
+  firebase_core: ^2.1.1
+  firebase_auth: ^4.1.0
+  cloud_firestore: ^4.0.3
+  google_sign_in: ^5.4.2
+  fluttertoast: ^8.1.1
+  google_fonts: ^3.0.1
+  flutter_secure_storage: ^6.0.0
+  flutter_screenutil: ^5.6.0
+  firebase_storage: ^11.0.4
+  image_picker: ^0.8.6
+  intl: ^0.17.0
 
 dev_dependencies:
   flutter_test:
@@ -68,6 +79,7 @@ flutter:
   
   assets:
     - assets/images/background.png
+    - assets/images
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
