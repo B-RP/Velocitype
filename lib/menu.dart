@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
+import 'data.dart';
 
-class Menu extends StatelessWidget {
+class Menu extends StatefulWidget {
   const Menu(BuildContext context, {super.key});
+
+  @override
+  State<StatefulWidget> createState() => _MenuState();
+}
+
+class _MenuState extends State<Menu> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -11,19 +18,20 @@ class Menu extends StatelessWidget {
           var height = MediaQuery.of(context).size.height;
           var width = MediaQuery.of(context).size.width;
 
-          return Container(
+          return SizedBox(
               height: height - 150,
               width: width - 150,
               child: Column(children: [
                 Row(children: [
-                  Spacer(),
-                  new IconButton(
-                      icon: Icon(
+                  const Spacer(),
+                  IconButton(
+                      icon: const Icon(
                         Icons.minimize_rounded,
                         color: Color.fromARGB(255, 99, 96, 96),
                       ),
                       onPressed: () {
                         Navigator.of(context).pop();
+                        Data.newTest();
                       }),
                 ]),
                 Center(
@@ -31,46 +39,46 @@ class Menu extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                       Text(
-                        "70 WPM",
-                        style: TextStyle(
+                        "${Data.totalWords} WPM",
+                        style: const TextStyle(
                           fontSize: 80,
                           color: Color.fromARGB(255, 31, 38, 169),
                         ),
                       ),
-                      Text(
-                        "Top 15%",
-                        style: TextStyle(
-                          fontSize: 30,
-                          color: Color.fromARGB(255, 31, 38, 169),
-                        ),
-                      ),
+                      //Text(
+                      //  "Top 15%",
+                      //  style: TextStyle(
+                      //    fontSize: 30,
+                      //    color: Color.fromARGB(255, 31, 38, 169),
+                      //  ),
+                      //),
                       Padding(
-                          padding: EdgeInsets.all(16.0),
+                          padding: const EdgeInsets.all(16.0),
                           child: Column(children: [
                             Text(
-                              "Keystrokes    (320 | 0) 320",
-                              style: TextStyle(
+                              "Keystrokes    (${Data.totalKeys - Data.totalIncKeys} | ${Data.totalIncKeys}) ${Data.totalKeys}",
+                              style: const TextStyle(
                                 fontSize: 35,
                                 color: Color.fromARGB(255, 58, 58, 61),
                               ),
                             ),
                             Text(
-                              "Accuracy       100.00%",
-                              style: TextStyle(
+                              "Accuracy       ${Data.wordAccuracy}%",
+                              style: const TextStyle(
                                 fontSize: 35,
                                 color: Color.fromARGB(255, 58, 58, 61),
                               ),
                             ),
                             Text(
-                              "Correct words      70",
-                              style: TextStyle(
+                              "Correct words      ${Data.totalWords - Data.totalIncWords}",
+                              style: const TextStyle(
                                 fontSize: 35,
                                 color: Color.fromARGB(255, 58, 58, 61),
                               ),
                             ),
                             Text(
-                              "Wrong words        0",
-                              style: TextStyle(
+                              "Wrong words        ${Data.totalIncWords}",
+                              style: const TextStyle(
                                 fontSize: 35,
                                 color: Color.fromARGB(255, 58, 58, 61),
                               ),

@@ -1,8 +1,7 @@
 //import 'dart:html';
 
-// ignore_for_file: prefer_const_constructors
-
 import 'package:flutter/material.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
 import 'data.dart';
 import 'menu.dart';
@@ -10,8 +9,6 @@ import 'menu.dart';
 import 'dart:async';
 
 void main() {
-  //print("Testing back end");
-  //print(Data.testInt);
   runApp(const MyApp());
 }
 
@@ -22,7 +19,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: 'Flutter Demo',
+        title: 'Velocitype',
         theme: ThemeData(
             primaryColor: Colors.redAccent, primaryColorDark: Colors.red
             //colorSchemeSeed: const Color.fromARGB(255, 255, 255, 255),
@@ -41,6 +38,8 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   final GlobalKey<_WordBankState> _wordKey = GlobalKey();
+  final GlobalKey<_CountdownTimerState> _timerKey = GlobalKey();
+  final GlobalKey<_InteractionRowState> _InterRowKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
@@ -61,9 +60,20 @@ class _MainPageState extends State<MainPage> {
                 child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      const Padding(
-                        padding: EdgeInsets.fromLTRB(0, 20, 0, 10),
-                        child: CountdownTimer(),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 20, 0, 10),
+                        child: CountdownTimer(
+                          key: _timerKey,
+
+                          //TEST FINISHED
+                          timerFinished: () {
+                            Data.calcWordAccuracy();
+                            Data.timerActive = false;
+                            _InterRowKey.currentState?.showMenu(context);
+                            _wordKey.currentState?.refresh();
+                            _timerKey.currentState?.resetTimer();
+                          },
+                        ),
                       ),
                       Padding(
                         padding: const EdgeInsets.fromLTRB(0, 20, 0, 10),
@@ -74,23 +84,50 @@ class _MainPageState extends State<MainPage> {
                       Padding(
                           padding: const EdgeInsets.fromLTRB(0, 20, 0, 10),
                           child: InteractionRow(
-                            checkIndex: () {
-                              _wordKey.currentState?.moveToNextWord();
-                            },
-                          ))
+                              key: _InterRowKey,
+                              refreshTest: () {
+                                Data.newTest();
+                                Data.timerActive = false;
+                                _wordKey.currentState?.refresh();
+                                _timerKey.currentState?.resetTimer();
+                              },
+                              checkIndex: () {
+                                _wordKey.currentState?.moveToNextWord();
+                              },
+                              startTimer: () {
+                                _timerKey.currentState?.startTimer();
+                              },
+                              checkWord: () {
+                                if (Data.checkWord(
+                                    Data.inputTyped, Data.targetWord)) {
+                                  _wordKey.currentState?.changeColor("g");
+                                } else {
+                                  _wordKey.currentState?.changeColor("r");
+                                }
+                              },
+                              checkFullWord: () {
+                                if (Data.checkFullWord(
+                                    Data.inputTyped, Data.targetWord)) {
+                                  _wordKey.currentState?.changeColor("g");
+                                } else {
+                                  _wordKey.currentState?.changeColor("r");
+                                }
+                              }))
                     ]))));
   }
 }
 
 class CountdownTimer extends StatefulWidget {
-  const CountdownTimer({super.key});
+  const CountdownTimer({super.key, required this.timerFinished});
+
+  final VoidCallback timerFinished;
   @override
   State<CountdownTimer> createState() => _CountdownTimerState();
 }
 
 class _CountdownTimerState extends State<CountdownTimer> {
   Timer? countdownTimer;
-  Duration testDuration = Duration(minutes: 1);
+  Duration testDuration = const Duration(minutes: 1);
 
   @override
   void initState() {
@@ -98,7 +135,8 @@ class _CountdownTimerState extends State<CountdownTimer> {
   }
 
   void startTimer() {
-    Timer.periodic(Duration(seconds: 1), (_) => setCountDown());
+    countdownTimer =
+        Timer.periodic(const Duration(seconds: 1), (_) => setCountDown());
   }
 
   void stopTimer() {
@@ -107,22 +145,25 @@ class _CountdownTimerState extends State<CountdownTimer> {
 
   void resetTimer() {
     stopTimer();
-    setState(() => testDuration = Duration(days: 5));
+    setState(() => testDuration = const Duration(minutes: 1));
   }
 
   void setCountDown() {
-    final reduceSecondsBy = 1;
+    const reduceSecondsBy = 1;
 
     setState(() {
       final seconds = testDuration.inSeconds - reduceSecondsBy;
+
       if (seconds < 0) {
-        countdownTimer!.cancel();
+        countdownTimer?.cancel();
+        widget.timerFinished();
       } else {
         testDuration = Duration(seconds: seconds);
       }
     });
   }
 
+  @override
   Widget build(BuildContext context) {
     String strDigits(int n) => n.toString().padLeft(2, '0');
     final minutes = strDigits(testDuration.inMinutes.remainder(60));
@@ -143,7 +184,6 @@ class Word extends StatefulWidget {
   Word({super.key, required this.s});
 
   @override
-  // ignore: no_logic_in_create_state
   State<StatefulWidget> createState() => _WordState(s: s);
 }
 
@@ -151,6 +191,8 @@ class _WordState extends State<Word> {
   _WordState({
     required this.s,
   });
+
+  Color c = Colors.white;
 
   void changeWord(String s) {
     setState(() {
@@ -160,10 +202,7 @@ class _WordState extends State<Word> {
 
   void underLine() {
     setState(() {
-      wordStyle = TextStyle(
-          fontSize: 25,
-          color: Colors.white,
-          decoration: TextDecoration.underline);
+      wordStyle = TextStyle(fontSize: 25, color: c);
     });
   }
 
@@ -171,7 +210,25 @@ class _WordState extends State<Word> {
     setState(() {
       wordStyle = TextStyle(
         fontSize: 25,
-        color: Colors.white,
+        color: c,
+      );
+    });
+  }
+
+  //parameter color will receive only "g" for green "r" for red and "w" for white
+  void setColor(String color) {
+    if (color == "g") {
+      c = Colors.green;
+    } else if (color == "r") {
+      c = Colors.red;
+    } else if (color == "w") {
+      c = Colors.white;
+    }
+
+    setState(() {
+      wordStyle = TextStyle(
+        fontSize: 25,
+        color: c,
       );
     });
   }
@@ -185,7 +242,11 @@ class _WordState extends State<Word> {
 
   @override
   Widget build(BuildContext context) {
-    return Text(s, style: wordStyle);
+    return AutoSizeText(
+      s,
+      style: wordStyle,
+      maxLines: 1,
+    );
   }
 }
 
@@ -228,9 +289,10 @@ class _WordBankState extends State<WordBank> {
   ];
 
   int currentWord = 0;
+  var wordLine1 = Data.fillList();
+  var wordLine2 = Data.fillList();
 
   void moveToNextWord() {
-    print("activated in word bank");
     _wordKeys[currentWord].currentState?.removeUnderline();
     if (currentWord < 11) {
       _wordKeys[currentWord + 1].currentState?.underLine();
@@ -243,6 +305,8 @@ class _WordBankState extends State<WordBank> {
     } else {
       currentWord++;
     }
+
+    Data.targetWord = wordLine1[currentWord];
   }
 
   void selectFirst() {
@@ -250,10 +314,8 @@ class _WordBankState extends State<WordBank> {
     _wordKeys[11].currentState?.removeUnderline();
   }
 
-  var wordLine1 = Data.fillList();
-  var wordLine2 = Data.fillList();
-
   void refresh() {
+    currentWord = 0;
     wordLine1 = wordLine2;
     wordLine2 = Data.fillList();
 
@@ -261,15 +323,25 @@ class _WordBankState extends State<WordBank> {
       _wordKeys[i].currentState?.changeWord(wordLine1[i]);
       _wordKeys2[i].currentState?.changeWord(wordLine2[i]);
     }
+
+    for (int i = 0; i < _wordKeys.length; i++) {
+      _wordKeys[i].currentState?.setColor("w");
+    }
+
+    Data.targetWord = wordLine1[0];
+  }
+
+  void changeColor(String color) {
+    _wordKeys[currentWord].currentState?.setColor(color);
   }
 
   @override
   Widget build(BuildContext context) {
-    selectFirst();
+    Data.targetWord = wordLine1[0];
     return (Column(children: [
       Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          //Expanded(child: Word(s: wordLine1[0], key: _wordKeys[0])),
           Word(s: wordLine1[0], key: _wordKeys[0]),
           Word(s: wordLine1[1], key: _wordKeys[1]),
           Word(s: wordLine1[2], key: _wordKeys[2]),
@@ -285,6 +357,7 @@ class _WordBankState extends State<WordBank> {
         ],
       ),
       Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Word(s: wordLine2[0], key: _wordKeys2[0]),
           Word(s: wordLine2[1], key: _wordKeys2[1]),
@@ -304,22 +377,79 @@ class _WordBankState extends State<WordBank> {
   }
 }
 
-class InteractionRow extends StatelessWidget {
-  final textFieldController = TextEditingController();
+class InteractionRow extends StatefulWidget {
+  const InteractionRow(
+      {super.key,
+      required this.checkIndex,
+      required this.checkWord,
+      required this.startTimer,
+      required this.checkFullWord,
+      required this.refreshTest});
 
   final VoidCallback checkIndex;
+  final VoidCallback checkWord;
+  final VoidCallback startTimer;
+  final VoidCallback checkFullWord;
+  final VoidCallback refreshTest;
 
-  InteractionRow({super.key, required this.checkIndex});
+  @override
+  State<StatefulWidget> createState() => _InteractionRowState();
+}
+
+class _InteractionRowState extends State<InteractionRow> {
+  final textFieldController = TextEditingController();
+
+  void showMenu(context) {
+    showGeneralDialog(
+      context: context,
+      pageBuilder: (ctx, a1, a2) {
+        return Menu(context);
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(0.0, 1.0);
+        const end = Offset.zero;
+        const curve = Curves.ease;
+
+        var tween =
+            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+        return SlideTransition(
+          position: animation.drive(tween),
+          child: child,
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Row(children: <Widget>[
       Expanded(
           child: TextField(
               onChanged: (text) {
-                if (text[text.length - 1] == " ") {
-                  textFieldController.clear();
-                  checkIndex();
-                  Data.currentIndex++;
+                if (true) {
+                  //when space is pressed
+                  if (text[text.length - 1] == " ") {
+                    Data.inputTyped = text;
+                    widget.checkFullWord();
+
+                    textFieldController.clear();
+                    widget.checkIndex();
+                    Data.currentIndex++;
+                  }
+
+                  //if anything other than space is inputed, check spelling so far
+                  else {
+                    Data.inputTyped = text;
+                    widget.checkWord();
+                  }
+                }
+
+                //start timer whenever the user begins to type
+                if (Data.timerActive) {
+                } else {
+                  widget.startTimer();
+                  Data.timerActive = true;
                 }
               },
               style: const TextStyle(color: Colors.white),
@@ -329,7 +459,9 @@ class InteractionRow extends StatelessWidget {
       IconButton(
           iconSize: 40,
           icon: const Icon(Icons.refresh),
-          onPressed: () {},
+          onPressed: () {
+            widget.refreshTest();
+          },
           style: IconButton.styleFrom(
             foregroundColor: Colors.white,
             backgroundColor: Colors.transparent,
@@ -341,25 +473,7 @@ class InteractionRow extends StatelessWidget {
       IconButton(
         icon: const Icon(Icons.menu),
         onPressed: () {
-          showGeneralDialog(
-            context: context,
-            pageBuilder: (ctx, a1, a2) {
-              return Menu(context);
-            },
-            transitionBuilder: (context, animation, secondaryAnimation, child) {
-              const begin = Offset(0.0, 1.0);
-              const end = Offset.zero;
-              const curve = Curves.ease;
-
-              var tween =
-                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-              return SlideTransition(
-                position: animation.drive(tween),
-                child: child,
-              );
-            },
-          );
+          showMenu(context);
         },
       ),
     ]);

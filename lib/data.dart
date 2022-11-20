@@ -1,4 +1,3 @@
-import 'package:english_words/english_words.dart';
 import 'dart:math';
 
 import 'package:tempo_application/main.dart';
@@ -6,16 +5,26 @@ import 'package:tempo_application/main.dart';
 class Data {
   static int currentIndex = 0;
 
-  int totalWords = 0;
-  int totalIncWords = 0;
-  int totalKeys = 0;
-  int totalIncKeys = 0;
+  static int totalWords = 0;
+  static int totalIncWords = 0;
 
-  double calcWordAccuracy() {
+  static int totalKeys = 0;
+  static int totalIncKeys = 0;
+
+  static double wordAccuracy = 0;
+
+  static String inputTyped = "";
+  static String targetWord = "";
+
+  static bool timerActive = false;
+
+  static double calcWordAccuracy() {
     var correctWords = totalWords - totalIncWords;
-    var wordAccuracy = correctWords / totalWords;
+    var wordAcc = correctWords / totalWords;
 
-    return wordAccuracy * 100;
+    wordAccuracy = wordAcc * 100;
+
+    return wordAcc * 100;
   }
 
   double calcKeyAccuracy() {
@@ -28,6 +37,29 @@ class Data {
   double calcWPM(double timer) {
     var wpm = totalWords / timer;
     return wpm;
+  }
+
+  static bool checkWord(String word, String target) {
+    for (int i = 0; i < word.length; i++) {
+      if (word[i] != target[i]) {
+        totalKeys++;
+        totalIncKeys++;
+        return false;
+      }
+    }
+    totalKeys++;
+    return true;
+  }
+
+  static bool checkFullWord(String word, String target) {
+    if (word == target) {
+      totalWords++;
+      return true;
+    } else {
+      totalWords++;
+      totalIncWords++;
+      return false;
+    }
   }
 
   static var wordList = [
@@ -987,11 +1019,23 @@ class Data {
   static List fillList() {
     var rng = Random();
 
-    var wordList2 = new List.filled(12, "");
+    var wordList2 = List.filled(12, "");
     for (int i = 0; i <= 11; i++) {
       wordList2[i] = "${wordList[rng.nextInt(wordList.length)]} ";
     }
 
     return wordList2;
+  }
+
+  static void newTest() {
+    currentIndex = 0;
+    totalWords = 0;
+    totalIncWords = 0;
+    totalKeys = 0;
+    totalIncKeys = 0;
+    wordAccuracy = 0;
+    inputTyped = "";
+    targetWord = "";
+    timerActive = false;
   }
 }
