@@ -63,7 +63,7 @@ class _MenuState extends State<Menu> {
                               ),
                             ),
                             Text(
-                              "Accuracy       ${Data.wordAccuracy}%",
+                              "Accuracy       ${Data.wordAccuracy.toStringAsFixed(2)}%",
                               style: const TextStyle(
                                 fontSize: 35,
                                 color: Color.fromARGB(255, 58, 58, 61),
