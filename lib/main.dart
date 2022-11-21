@@ -427,7 +427,7 @@ class _InteractionRowState extends State<InteractionRow> {
       Expanded(
           child: TextField(
               onChanged: (text) {
-                if (true) {
+                if (text != null) {
                   //when space is pressed
                   if (text[text.length - 1] == " ") {
                     Data.inputTyped = text;
