@@ -1,8 +1,5 @@
 import 'dart:convert';
 
-// User model holds a model for user
-// name, unique id, email, and profile image
-
 FUser fUserFromJson(String str) => FUser.fromJson(json.decode(str));
 
 String fUserToJson(FUser data) => json.encode(data.toJson());

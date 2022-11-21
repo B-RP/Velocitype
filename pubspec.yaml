@@ -49,6 +49,9 @@ dependencies:
   firebase_storage: ^11.0.4
   image_picker: ^0.8.6
   intl: ^0.17.0
+  firebase_core_platform_interface: ^4.5.2
+
+
 
 dev_dependencies:
   flutter_test:
@@ -78,8 +81,7 @@ flutter:
   #   - images/a_dot_ham.jpeg
   
   assets:
-    - assets/images/background.png
-    - assets/images
+    - assets/images/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

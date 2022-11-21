@@ -4,20 +4,18 @@ import 'dart:math';
 import 'package:tempo_application/main.dart';
 
 class Data {
-  static int testInt = 0; // Added - Lis
+  static int testInt = 0;
   int totalWords = 0;
   int totalIncWords = 0;
   int totalKeys = 0;
   int totalIncKeys = 0;
   Data() {
-    // Added - Lis
     totalWords = 0;
     totalIncWords = 0;
     totalKeys = 0;
     totalIncKeys = 0;
     testInt = 0;
   }
-
   double calcWordAccuracy() {
     var correctWords = totalWords - totalIncWords;
     var wordAccuracy = correctWords / totalWords;

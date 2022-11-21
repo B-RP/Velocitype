@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-// WHEN THE USER SIGNS IN
-// THE HELPING MESSAGES SHOW IN THE BOTTOM SCREEN
-// TEXT FIELD CLASS
 showToast(String message) {
   Fluttertoast.showToast(
       msg: message,
@@ -16,7 +13,6 @@ showToast(String message) {
       fontSize: 16.0);
 }
 
-// TEXT FIELD CLASS
 Widget buildTextField(
     {required String hint,
     required TextEditingController controller,
@@ -43,7 +39,6 @@ Widget buildTextField(
   );
 }
 
-// DISPLAY LOGO FUNCTION
 Widget buildLogo() {
   return SizedBox(
     height: 120.h,

@@ -4,13 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
-import 'package:tempo_application/controller/userControl.dart';
-import 'package:tempo_application/views/addProfilePic.dart';
-import 'package:tempo_application/model/userModel.dart';
+import 'package:tempo_application/controller/user_controller.dart';
+import 'package:tempo_application/views/add_profile_pic.dart';
+
+import '../model/user_model.dart';
 import 'login.dart';
 
-// REGISTER SCREEN FOR USER TO REGISTER
-// GUI && FUNCTIONS
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
 
@@ -39,7 +38,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       content: ScreenUtilInit(
         builder: (context, child) => Text(
           message,
-          style: TextStyle(fontWeight: FontWeight.w400, fontSize: 14.sp),
+          style: TextStyle(fontWeight: FontWeight.w400, fontSize: 10.sp),
         ),
       ),
     );
@@ -93,7 +92,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           'Create Account',
                           style: TextStyle(
                               height: 0.65,
-                              fontSize: 24.sp,
+                              fontSize: 10.sp,
                               fontWeight: FontWeight.w600,
                               color: Colors.black),
                         ),
@@ -101,7 +100,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         Text(
                           'create new account',
                           style: TextStyle(
-                              color: const Color(0xff737373), fontSize: 14.sp),
+                              color: const Color(0xff737373), fontSize: 10.sp),
                         ),
                         SizedBox(
                           height: 20.h,
@@ -125,16 +124,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               color: Colors.grey,
                             )),
                         SizedBox(
-                          height: 14.5.h,
+                          height: 14.h,
                         ),
                         Container(
+                          width: MediaQuery.of(context).size.width * .5,
                           decoration: BoxDecoration(
                               color: Colors.grey.withOpacity(0.10),
                               borderRadius: BorderRadius.circular(10.r)),
                           padding: EdgeInsets.symmetric(horizontal: 12.w),
                           margin: EdgeInsets.symmetric(horizontal: 0.w),
                           child: TextField(
-                            style: TextStyle(color: Colors.black54),
+                            style: TextStyle(
+                                color: Colors.black54,
+                                fontSize: 10.sp,
+                                fontWeight: FontWeight.normal),
                             controller: _password,
                             obscureText: passObscure,
                             decoration: InputDecoration(
@@ -165,7 +168,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 border: InputBorder.none,
                                 hintText: "Password",
                                 hintStyle: TextStyle(
-                                    fontSize: 14.sp,
+                                    fontSize: 10.sp,
                                     color: const Color(0xff737373),
                                     fontWeight: FontWeight.normal)),
                           ),
@@ -174,13 +177,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           height: 14.5.h,
                         ),
                         Container(
+                          width: MediaQuery.of(context).size.width * .5,
                           decoration: BoxDecoration(
                               color: Colors.grey.withOpacity(0.10),
                               borderRadius: BorderRadius.circular(10.r)),
                           padding: EdgeInsets.symmetric(horizontal: 12.w),
                           margin: EdgeInsets.symmetric(horizontal: 0.w),
                           child: TextField(
-                            style: TextStyle(color: Colors.black54),
+                            style: TextStyle(
+                                color: Colors.black54,
+                                fontSize: 10.sp,
+                                fontWeight: FontWeight.normal),
                             controller: _confirmPassword,
                             obscureText: confirmPassObscure,
                             decoration: InputDecoration(
@@ -209,7 +216,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 border: InputBorder.none,
                                 hintText: 'Confirm password',
                                 hintStyle: TextStyle(
-                                    fontSize: 14.sp,
+                                    fontSize: 10.sp,
                                     color: const Color(0xff737373),
                                     fontWeight: FontWeight.normal)),
                           ),
@@ -217,131 +224,129 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         SizedBox(
                           height: 30.h,
                         ),
-                        InkWell(
-                          // CREATES THE ACCOUNT
-                          onTap: () async {
-                            //Start  loader
-                            setState(() {
-                              loading = true;
-                            });
-                            //If any text field is empty then ask user to first fill it
-                            bool notEmpty = (_name.text != '' &&
-                                _email.text != '' &&
-                                _password.text != '' &&
-                                _confirmPassword.text != '');
-                            if (!notEmpty) {
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.5,
+                          child: InkWell(
+                            onTap: () async {
+                              //Start  loader
                               setState(() {
-                                loading = false;
+                                loading = true;
                               });
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  snackBar('Please fill all details'));
-                            } else if (_name.text.isEmpty) {
-                              setState(() {
-                                loading = false;
-                              });
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  snackBar('Please enter your name'));
-                            } else if (_email.text.isEmpty ||
-                                !(_email.text.contains("@")) ||
-                                !(_email.text.contains("."))) {
-                              setState(() {
-                                loading = false;
-                              });
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  snackBar(
-                                      'Alert! Your email is badly formatted'));
-                            } else if (_password.text.isEmpty ||
-                                (_password.text.length < 7)) {
-                              setState(() {
-                                loading = false;
-                              });
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  snackBar(
-                                      'Please enter at least 8 digit password'));
-                            } else if (_password.text.isEmpty ||
-                                (_password.text.length < 7)) {
-                              setState(() {
-                                loading = false;
-                              });
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  snackBar(
-                                      'Please enter at least 8 digit password'));
-                            } else if (_password.text !=
-                                (_confirmPassword.text)) {
-                              setState(() {
-                                loading = false;
-                              });
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  snackBar(
-                                      'Alert! your password doesn\'t matched'));
-                            } else {
-                              try {
-                                // Register user with email and password
-                                FirebaseAuth _auth = FirebaseAuth
-                                    .instance; // CREATE FIREBASE INSTANCE
-                                UserCredential
-                                    _newUser = // ASSIGNING USER TO NEW USER
-                                    await _auth.createUserWithEmailAndPassword(
-                                  // FIREBASE BUILT IN FUNCTION CREATE WITH EMAIL
-                                  email: _email.text.trim(),
-                                  password: _password.text,
-                                );
-                                // Add other details of user to the firebase as well
-                                if (_newUser.user != null) {
-                                  // IF USER IS NULL THE USER WAS NOT REGISTERED SUCCESFULLY
-                                  FirebaseFirestore.instance
-                                      .collection("users")
-                                      .doc(_auth.currentUser!.uid)
-                                      .set({
-                                    "email": _email.text.trim(),
-                                    "name": _name.text.trim(),
-                                    "uid": _auth.currentUser!.uid,
-                                    "photo": "",
-                                  });
-                                  // IF USER IS NOT NULL SAVE USER INTO FIREBASE DATABASE:
-                                  FirebaseFirestore.instance
-                                      .collection("users")
-                                      .doc(_newUser.user!.uid)
-                                      .get()
-                                      .then((value) {
-                                    FUser user = FUser.fromJson(value.data()!);
-                                    _userController.loginUser.value = user;
-                                    setState(() {
-                                      loading = false;
-                                    });
-                                    saveUser(); // SAVING THE USER
-                                    // After saving that details move user to add profile picture screen
-                                    _userController.isGuest.value = false;
-                                    Get.to(() => const AddProfilePic());
-                                  });
-                                } else {
-                                  //close loader
-                                  setState(() {
-                                    loading = false;
-                                  });
-                                }
-                              } on FirebaseAuthException catch (e) {
+                              //If any text field is empty then ask user to first fill it
+                              bool notEmpty = (_name.text != '' &&
+                                  _email.text != '' &&
+                                  _password.text != '' &&
+                                  _confirmPassword.text != '');
+                              if (!notEmpty) {
                                 setState(() {
                                   loading = false;
                                 });
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(snackBar(e.message!));
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    snackBar('Please fill all details'));
+                              } else if (_name.text.isEmpty) {
+                                setState(() {
+                                  loading = false;
+                                });
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    snackBar('Please enter your name'));
+                              } else if (_email.text.isEmpty ||
+                                  !(_email.text.contains("@")) ||
+                                  !(_email.text.contains("."))) {
+                                setState(() {
+                                  loading = false;
+                                });
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    snackBar(
+                                        'Alert! Your email is badly formatted'));
+                              } else if (_password.text.isEmpty ||
+                                  (_password.text.length < 7)) {
+                                setState(() {
+                                  loading = false;
+                                });
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    snackBar(
+                                        'Please enter at least 8 digit password'));
+                              } else if (_password.text.isEmpty ||
+                                  (_password.text.length < 7)) {
+                                setState(() {
+                                  loading = false;
+                                });
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    snackBar(
+                                        'Please enter at least 8 digit password'));
+                              } else if (_password.text !=
+                                  (_confirmPassword.text)) {
+                                setState(() {
+                                  loading = false;
+                                });
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    snackBar(
+                                        'Alert! your password doesn\'t matched'));
+                              } else {
+                                try {
+                                  // Register user with email and password
+                                  FirebaseAuth _auth = FirebaseAuth.instance;
+                                  UserCredential _newUser = await _auth
+                                      .createUserWithEmailAndPassword(
+                                    email: _email.text.trim(),
+                                    password: _password.text,
+                                  );
+                                  // Add other details of user to the firebase as well
+                                  if (_newUser.user != null) {
+                                    FirebaseFirestore.instance
+                                        .collection("users")
+                                        .doc(_auth.currentUser!.uid)
+                                        .set({
+                                      "email": _email.text.trim(),
+                                      "name": _name.text.trim(),
+                                      "uid": _auth.currentUser!.uid,
+                                      "photo": "",
+                                    });
+                                    FirebaseFirestore.instance
+                                        .collection("users")
+                                        .doc(_newUser.user!.uid)
+                                        .get()
+                                        .then((value) {
+                                      FUser user =
+                                          FUser.fromJson(value.data()!);
+                                      _userController.loginUser.value = user;
+                                      setState(() {
+                                        loading = false;
+                                      });
+                                      saveUser();
+                                      // After saving that details move user to add profile picture screen
+                                      _userController.isGuest.value = false;
+                                      Get.to(() => const AddProfilePic());
+                                    });
+                                  } else {
+                                    //close loader
+                                    setState(() {
+                                      loading = false;
+                                    });
+                                  }
+                                } on FirebaseAuthException catch (e) {
+                                  setState(() {
+                                    loading = false;
+                                  });
+                                  ScaffoldMessenger.of(context)
+                                      .showSnackBar(snackBar(e.message!));
+                                }
                               }
-                            }
-                          },
-                          child: Container(
-                            alignment: Alignment.center,
-                            padding: EdgeInsets.symmetric(
-                              vertical: 10.h,
-                            ),
-                            // width: double.infinity,
-                            decoration: BoxDecoration(
-                                color: const Color(0xff2F00F9),
-                                borderRadius: BorderRadius.circular(10.r)),
-                            child: Text(
-                              'Create account',
-                              style: TextStyle(
-                                  color: Colors.white, fontSize: 14.sp),
+                            },
+                            child: Container(
+                              alignment: Alignment.center,
+                              padding: EdgeInsets.symmetric(
+                                vertical: 10.h,
+                              ),
+                              // width: double.infinity,
+                              decoration: BoxDecoration(
+                                  color: const Color(0xff2F00F9),
+                                  borderRadius: BorderRadius.circular(10.r)),
+                              child: Text(
+                                'Create account',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 10.sp),
+                              ),
                             ),
                           ),
                         ),
@@ -354,7 +359,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             Text(
                               'Already have an account?',
                               style: TextStyle(
-                                  fontSize: 14.sp,
+                                  fontSize: 10.sp,
                                   color: const Color(0xff737373)),
                             ),
                             InkWell(
@@ -366,7 +371,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   ' Login',
                                   style: TextStyle(
                                       color: const Color(0xffE98445),
-                                      fontSize: 14.sp),
+                                      fontSize: 10.sp),
                                 )),
                           ],
                         )
@@ -388,13 +393,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
       required TextEditingController controller,
       required Icon icon}) {
     return Container(
+      width: MediaQuery.of(context).size.width * 0.5,
       decoration: BoxDecoration(
           color: Colors.grey.withOpacity(0.10),
           borderRadius: BorderRadius.circular(10.r)),
       padding: EdgeInsets.symmetric(horizontal: 12.w),
       margin: EdgeInsets.symmetric(horizontal: 0.w),
       child: TextField(
-        style: TextStyle(color: Colors.black54),
+        style: TextStyle(
+            color: Colors.black54,
+            fontSize: 10.sp,
+            fontWeight: FontWeight.normal),
         controller: controller,
         decoration: InputDecoration(
             prefixIcon: icon,
@@ -402,7 +411,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             border: InputBorder.none,
             hintText: hint,
             hintStyle: TextStyle(
-                fontSize: 14.sp,
+                fontSize: 10.sp,
                 color: const Color(0xff737373),
                 fontWeight: FontWeight.normal)),
       ),

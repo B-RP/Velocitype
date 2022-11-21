@@ -1,17 +1,19 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:tempo_application/controller/userControl.dart';
-import 'package:tempo_application/model/userModel.dart';
+import 'package:tempo_application/controller/user_controller.dart';
 import 'package:tempo_application/main.dart';
+
+import '../model/user_model.dart';
 import '../widget/toast.dart';
 
-// USER TO ADD A PROFILE PICTURE
 class AddProfilePic extends StatefulWidget {
   const AddProfilePic({Key? key}) : super(key: key);
 
@@ -40,7 +42,7 @@ class _AddProfilePicState extends State<AddProfilePic> {
                       height: 72.h,
                     ),
                     Text(
-                      'You\'re all set!',
+                      'Your all set!',
                       style:
                           TextStyle(fontSize: 24, fontWeight: FontWeight.w700),
                     ),
@@ -77,30 +79,26 @@ class _AddProfilePicState extends State<AddProfilePic> {
                       height: 46.h,
                     ),
                     Text(
-                      // CUSTOMIZED WELCOME MESSAGES FOR USER
                       'Welcome ${_userController.loginUser.value.name}!',
                       style: TextStyle(
-                          fontSize: 14.sp, fontWeight: FontWeight.w700),
+                          fontSize: 10.sp, fontWeight: FontWeight.w700),
                     ),
                     Text(
-                      // ADD PROFILE PICTURE
-                      'Take a minute to add a profile picture',
+                      'Take a minute to add a profile picture.',
                       style: TextStyle(
-                          fontSize: 14.sp, fontWeight: FontWeight.w200),
+                          fontSize: 10.sp, fontWeight: FontWeight.w200),
                     ),
                     SizedBox(
                       height: 20.h,
                     ),
                     InkWell(
-                      // UPLOAD THEIR OWN IMAGE OR TAKE A PICTURE
                       onTap: () {
                         //  CapturePhoto.pickImg(context);
                         if (photo == '') {
                           selectImage();
                         } else {
                           _userController.isGuest.value = false;
-                          Get.offAll(
-                              () => const MyApp()); // GOES BACK TO HOMESCREEN
+                          Get.offAll(() => const MyApp());
                         }
                       },
                       child: Container(
@@ -115,7 +113,7 @@ class _AddProfilePicState extends State<AddProfilePic> {
                           style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.w700,
-                              fontSize: 14.sp),
+                              fontSize: 10.sp),
                         ),
                       ),
                     )
@@ -183,11 +181,10 @@ class _AddProfilePicState extends State<AddProfilePic> {
       },
     );
   }
+  //Open image picker
 
-// Open image picker
-// GETTING IMAGE FROM CAMERA
   final ImagePicker _picker = ImagePicker();
-  File? _image;
+  Uint8List? _image;
   bool uploadingImage = false;
   String photo = '';
   Future getImage(
@@ -199,24 +196,24 @@ class _AddProfilePicState extends State<AddProfilePic> {
       maxHeight: 1800,
     );
     if (pickedFile != null) {
-      setState(() {
-        _image = File(pickedFile.path);
-      });
+      print(pickedFile.path);
+      _image = await pickedFile.readAsBytes();
+      setState(() {});
 
       uploadingImage = true;
       // Upload image to Firebase storage and get the online link and store that link to the cloud firestore
       Reference userStorageReference = FirebaseStorage.instance
           .ref()
           .child("users")
-          .child(DateTime.now().millisecondsSinceEpoch.toString());
-      UploadTask snap = userStorageReference.putFile(_image!);
+          .child(DateTime.now().millisecondsSinceEpoch.toString() + '.jpg');
+      UploadTask snap = userStorageReference.putData(_image!);
       snap.whenComplete(() async {
         photo = await snap.snapshot.ref.getDownloadURL();
         FirebaseFirestore.instance
             .collection("users")
             .doc(FirebaseAuth.instance.currentUser!.uid)
             .set({
-          "photo": photo, // ASSIGNING PHOTO TO USER PHOTO
+          "photo": photo,
         }, SetOptions(merge: true)).whenComplete(() {
           FirebaseFirestore.instance
               .collection("users")

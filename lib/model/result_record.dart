@@ -1,10 +1,9 @@
 // To parse this JSON data, do
 //
-// final resultRecord = resultRecordFromJson(jsonString);
+//     final resultRecord = resultRecordFromJson(jsonString);
 
 import 'dart:convert';
 
-// RESULT RECORDS MODEL
 ResultRecord resultRecordFromJson(String str) =>
     ResultRecord.fromJson(json.decode(str));
 

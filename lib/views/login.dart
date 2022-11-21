@@ -5,13 +5,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:tempo_application/controller/userControl.dart';
+import 'package:tempo_application/controller/user_controller.dart';
 import 'package:tempo_application/main.dart';
-import 'package:tempo_application/views/registerScreen.dart';
-import 'package:tempo_application/model/resultRecord.dart';
-import 'package:tempo_application/model/userModel.dart';
+import 'package:tempo_application/views/register_screen.dart';
 
-// LOGIN GUI && FUNCTIONS
+import '../model/result_record.dart';
+import '../model/user_model.dart';
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
 
@@ -28,8 +28,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   final storage = const FlutterSecureStorage();
 
-  final UserController _userController = Get.put(
-      UserController()); // CREATING AN INSTANCE OF USERCONTROLLER CLASS IN USER MODEL
+  final UserController _userController = Get.put(UserController());
 
   saveUser() async {
     await storage.write(key: "email", value: email.text);
@@ -41,9 +40,8 @@ class _LoginScreenState extends State<LoginScreen> {
     // TODO: implement initState
     super.initState();
   }
-
   //When user will login this function will call, and get the details of user past results and assign them to user controller
-  // PULLING THE RECORDS FROM FIREBASE
+
   getResults() async {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
         .collection("tests")
@@ -51,7 +49,6 @@ class _LoginScreenState extends State<LoginScreen> {
         .collection("results")
         .get();
     if (querySnapshot.docs.isNotEmpty) {
-      // LOOP TO CHECK AND PULL EACH RECORD
       for (var element in querySnapshot.docs) {
         _userController.records.add(ResultRecord(
           score: element.get("score"),
@@ -101,7 +98,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           'Welcome back!',
                           style: TextStyle(
                               height: 0.65,
-                              fontSize: 24.sp,
+                              fontSize: 14.sp,
                               fontWeight: FontWeight.w600,
                               color: Colors.black),
                         ),
@@ -109,7 +106,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         Text(
                           'sign in to continue',
                           style: TextStyle(
-                              color: const Color(0xff737373), fontSize: 14.sp),
+                              color: const Color(0xff737373), fontSize: 10.sp),
                         ),
                         SizedBox(
                           height: 30.h,
@@ -125,6 +122,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           height: 20.h,
                         ),
                         Container(
+                          width: MediaQuery.of(context).size.width * 0.5,
                           decoration: BoxDecoration(
                               color: Colors.grey.withOpacity(0.20),
                               borderRadius: BorderRadius.circular(10.r)),
@@ -132,7 +130,10 @@ class _LoginScreenState extends State<LoginScreen> {
                               horizontal: 12.w, vertical: 3),
                           margin: EdgeInsets.symmetric(horizontal: 0.w),
                           child: TextField(
-                            style: TextStyle(color: Colors.black54),
+                            style: TextStyle(
+                                color: Colors.black54,
+                                fontSize: 10.sp,
+                                fontWeight: FontWeight.normal),
                             controller: password,
                             obscureText: passObscure,
                             decoration: InputDecoration(
@@ -172,87 +173,85 @@ class _LoginScreenState extends State<LoginScreen> {
                         SizedBox(
                           height: 30.h,
                         ),
-                        Center(
-                          child: InkWell(
-                            onTap: () async {
-                              // Show loader
-                              setState(() {
-                                loading = true;
-                              });
-                              //If email or password text field is empty then show message to fill that field
-                              if (email.text == "" && password.text == "") {
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.5,
+                          child: Center(
+                            child: InkWell(
+                              onTap: () async {
+                                // Show loader
                                 setState(() {
-                                  loading = false;
+                                  loading = true;
                                 });
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    snackBar(
-                                        'Alert! Please enter all details'));
-                              }
-                              //Check Email is well formatted or not
-                              else if (email.text.isEmpty ||
-                                  !(email.text.contains("@")) ||
-                                  !(email.text.contains("."))) {
-                                setState(() {
-                                  loading = false;
-                                });
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    snackBar(
-                                        'Alert! Your email is badly formatted'));
-                              } else {
-                                try {
-                                  //if Every condition fulfills then sign in user and store details of user to mobile local storage
-                                  FirebaseAuth _auth =
-                                      FirebaseAuth.instance; // FIREBASE OBJECT
-                                  await _auth
-                                      .signInWithEmailAndPassword(
-                                          // CALLING FUNCTION BUILT IN FIREBASEVAUTH CLASS
-                                          email: email.text,
-                                          password: password.text)
-                                      .then((value) async {
-                                    if (value.user != null) {
-                                      // IF IT = NULL THE PASSWORD OR EMAIL ARE INCORRECT, IF ITS NOT NULL IT LOGS IN CORRECTLT
-                                      saveUser(); // CALLING THIS FUNCTION KEEPS THE USER LOGGED IN
-                                      await FirebaseFirestore
-                                          .instance // GET USER INFO FROM FIREBASE
-                                          .collection(
-                                              "users") // FOUND IN THE USERS COLLECTION
-                                          .doc(value.user!.uid) // UNDER USER ID
-                                          .get()
-                                          .then((value) {
-                                        if (value.data() != null) {
-                                          FUser fUser =
-                                              FUser.fromJson(value.data()!);
-                                          _userController.loginUser.value =
-                                              fUser; // PASS THE USER LOGIN INFO TO USERCONTROLLER FOUND IN USERMODEL
-                                        }
-                                      });
-                                      getResults();
-                                      _userController.isGuest.value = false;
-                                      //Navigate user to Home page
-                                      Get.offAll(() => const MyApp());
-                                    }
-                                  });
-                                } on FirebaseAuthException catch (e) {
+                                //If email or password text field is empty then show message to fill that field
+                                if (email.text == "" && password.text == "") {
                                   setState(() {
                                     loading = false;
-                                    ScaffoldMessenger.of(context)
-                                        .showSnackBar(snackBar(e.message!));
                                   });
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      snackBar(
+                                          'Alert! Please enter all details'));
                                 }
-                              }
-                            },
-                            child: Container(
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                  color: const Color(0xff2F00F9),
-                                  borderRadius: BorderRadius.circular(10.r)),
-                              padding: EdgeInsets.symmetric(
-                                vertical: 14.h,
-                              ),
-                              child: Text(
-                                'Login',
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 16.sp),
+                                //Check Email is well formatted or not
+                                else if (email.text.isEmpty ||
+                                    !(email.text.contains("@")) ||
+                                    !(email.text.contains("."))) {
+                                  setState(() {
+                                    loading = false;
+                                  });
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      snackBar(
+                                          'Alert! Your email is badly formatted'));
+                                } else {
+                                  try {
+                                    //if Every condition fulfills then sign in user and store details of user to mobile local storage
+                                    FirebaseAuth _auth = FirebaseAuth.instance;
+                                    await _auth
+                                        .signInWithEmailAndPassword(
+                                            email: email.text,
+                                            password: password.text)
+                                        .then((value) async {
+                                      if (value.user != null) {
+                                        saveUser();
+                                        await FirebaseFirestore.instance
+                                            .collection("users")
+                                            .doc(value.user!.uid)
+                                            .get()
+                                            .then((value) {
+                                          if (value.data() != null) {
+                                            FUser fUser =
+                                                FUser.fromJson(value.data()!);
+                                            _userController.loginUser.value =
+                                                fUser;
+                                          }
+                                        });
+                                        getResults();
+                                        _userController.isGuest.value = false;
+                                        //Navigate user to Home page
+                                        Get.offAll(() => const MyApp());
+                                      }
+                                    });
+                                  } on FirebaseAuthException catch (e) {
+                                    setState(() {
+                                      loading = false;
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(snackBar(e.message!));
+                                    });
+                                  }
+                                }
+                              },
+                              child: Container(
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                    color: const Color(0xff2F00F9),
+                                    borderRadius: BorderRadius.circular(10.r)),
+                                padding: EdgeInsets.symmetric(
+                                  vertical: 14.h,
+                                ),
+                                child: Text(
+                                  'Login',
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 16.sp),
+                                ),
                               ),
                             ),
                           ),
@@ -266,7 +265,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             Text(
                               'New user?',
                               style: TextStyle(
-                                  fontSize: 14.sp,
+                                  fontSize: 10.sp,
                                   color: const Color(0xff737373)),
                             ),
                             InkWell(
@@ -277,12 +276,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                   '  Register',
                                   style: TextStyle(
                                       color: const Color(0xffE98445),
-                                      fontSize: 14.sp),
+                                      fontSize: 10.sp),
                                 )),
                             Text(
                               ' OR ',
                               style: TextStyle(
-                                  color: Colors.black54, fontSize: 14.sp),
+                                  color: Colors.black54, fontSize: 10.sp),
                             ),
                             InkWell(
                                 onTap: () {
@@ -293,7 +292,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ' Guest Account',
                                   style: TextStyle(
                                       color: Color(0xff2F00F9),
-                                      fontSize: 14.sp),
+                                      fontSize: 10.sp),
                                 )),
                           ],
                         )
@@ -320,8 +319,12 @@ class _LoginScreenState extends State<LoginScreen> {
           borderRadius: BorderRadius.circular(10.r)),
       padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 5.h),
       margin: EdgeInsets.symmetric(horizontal: 2.w),
+      width: MediaQuery.of(context).size.width * 0.5,
       child: TextField(
-        style: TextStyle(color: Colors.black54),
+        style: TextStyle(
+            color: Colors.black54,
+            fontSize: 14.sp,
+            fontWeight: FontWeight.normal),
         controller: controller,
         decoration: InputDecoration(
             prefixIcon: icon,
@@ -336,8 +339,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-// LOGO FUNCTION
-// USED ANYWHERE TO DISPLAY LOGO
   Widget buildLogo() {
     return SizedBox(
       height: 200.h,
@@ -352,7 +353,7 @@ class _LoginScreenState extends State<LoginScreen> {
       content: ScreenUtilInit(
         builder: (context, child) => Text(
           message,
-          style: TextStyle(fontWeight: FontWeight.w400, fontSize: 14.sp),
+          style: TextStyle(fontWeight: FontWeight.w400, fontSize: 10.sp),
         ),
       ),
     );

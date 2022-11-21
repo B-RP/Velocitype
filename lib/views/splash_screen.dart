@@ -4,13 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
-import 'package:tempo_application/controller/userControl.dart';
+import 'package:tempo_application/controller/user_controller.dart';
 import 'package:tempo_application/views/login.dart';
 import '../main.dart';
-import 'package:tempo_application/model/resultRecord.dart';
-import 'package:tempo_application/model/userModel.dart';
+import '../model/result_record.dart';
+import '../model/user_model.dart';
 
-// FIRST SCREEN BLANK SCREEN WITH THE SPLASH LOGO
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
 
@@ -90,7 +89,7 @@ class _SplashScreenState extends State<SplashScreen> {
     }
   }
 
-// Function to get user past results record and then send to user controller
+// Function to get user past  results record and then them to user controller
   getResults() async {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
         .collection("tests")
