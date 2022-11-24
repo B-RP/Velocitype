@@ -12,6 +12,7 @@ class FUser {
     required this.profileImage,
   });
 
+// User data
   String name;
   String uid;
   String email;

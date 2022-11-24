@@ -24,7 +24,7 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       body: Center(
         child: SizedBox(
-            height: 200, child: Image.asset('assets/images/logoGif.gif')),
+            height: 400, child: Image.asset('assets/images/logoGif.gif')),
       ),
     );
   }
@@ -32,7 +32,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    // This function get the user details
+    // This function gets the user's details
     checkUser();
   }
 
@@ -51,7 +51,7 @@ class _SplashScreenState extends State<SplashScreen> {
 // When app runs this function call and
   checkUser() async {
     const storage = FlutterSecureStorage();
-    // Get the stored details of last user and keep its login again  if it doesn't logout
+    // Get the stored details of last user and keep it logged in if user doesn't logout
     String? email = await storage.read(key: "email");
     String? password = await storage.read(key: "password");
     if (await storage.read(key: "email") != null &&
@@ -60,7 +60,7 @@ class _SplashScreenState extends State<SplashScreen> {
         FirebaseAuth _auth = FirebaseAuth.instance;
         UserCredential newUser = await _auth.signInWithEmailAndPassword(
             email: email!, password: password!);
-        // get the records of results and give them to user controller
+        // Get the records of results and give them to user controller
         if (newUser.user != null) {
           await FirebaseFirestore.instance
               .collection("users")
@@ -76,7 +76,7 @@ class _SplashScreenState extends State<SplashScreen> {
         }
       } on FirebaseAuthException catch (e) {
         snackBar(e.message.toString());
-        // if user is not logged in then navigate user to login screen
+        // If user is not logged in then navigate user to login screen
         Future.delayed(const Duration(milliseconds: 1500), () {
           Get.offAll(() => const LoginScreen());
         });
@@ -89,7 +89,7 @@ class _SplashScreenState extends State<SplashScreen> {
     }
   }
 
-// Function to get user past  results record and then them to user controller
+// Function to get user's past results records and then them to user controller
   getResults() async {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
         .collection("tests")

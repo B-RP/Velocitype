@@ -40,8 +40,9 @@ class _LoginScreenState extends State<LoginScreen> {
     // TODO: implement initState
     super.initState();
   }
-  //When user will login this function will call, and get the details of user past results and assign them to user controller
 
+// GET RESULTS FUNCTION
+// When user logs in this function calls, gets the user's details like past results, and assigns them to user controller
   getResults() async {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
         .collection("tests")
@@ -98,15 +99,15 @@ class _LoginScreenState extends State<LoginScreen> {
                           'Welcome back!',
                           style: TextStyle(
                               height: 0.65,
-                              fontSize: 14.sp,
+                              fontSize: 8.sp,
                               fontWeight: FontWeight.w600,
                               color: Colors.black),
                         ),
                         SizedBox(height: 0.h),
                         Text(
-                          'sign in to continue',
+                          'Sign in to continue',
                           style: TextStyle(
-                              color: const Color(0xff737373), fontSize: 10.sp),
+                              color: const Color(0xff737373), fontSize: 4.sp),
                         ),
                         SizedBox(
                           height: 30.h,
@@ -117,22 +118,23 @@ class _LoginScreenState extends State<LoginScreen> {
                             icon: const Icon(
                               Icons.email,
                               color: Colors.grey,
+                              size: 20,
                             )),
                         SizedBox(
                           height: 20.h,
                         ),
                         Container(
-                          width: MediaQuery.of(context).size.width * 0.5,
+                          width: MediaQuery.of(context).size.width * 0.35,
                           decoration: BoxDecoration(
                               color: Colors.grey.withOpacity(0.20),
                               borderRadius: BorderRadius.circular(10.r)),
                           padding: EdgeInsets.symmetric(
-                              horizontal: 12.w, vertical: 3),
-                          margin: EdgeInsets.symmetric(horizontal: 0.w),
+                              horizontal: 8.w, vertical: 5.h),
+                          margin: EdgeInsets.symmetric(horizontal: 2.w),
                           child: TextField(
                             style: TextStyle(
                                 color: Colors.black54,
-                                fontSize: 10.sp,
+                                fontSize: 6.sp,
                                 fontWeight: FontWeight.normal),
                             controller: password,
                             obscureText: passObscure,
@@ -140,6 +142,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 prefixIcon: const Icon(
                                   Icons.lock,
                                   color: Colors.grey,
+                                  size: 20,
                                 ),
                                 suffixIcon: GestureDetector(
                                   child: Icon(
@@ -162,7 +165,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 border: InputBorder.none,
                                 hintText: "Password",
                                 hintStyle: TextStyle(
-                                    fontSize: 14.sp,
+                                    fontSize: 6.sp,
                                     color: const Color(0xff737373),
                                     fontWeight: FontWeight.normal)),
                           ),
@@ -174,7 +177,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           height: 30.h,
                         ),
                         SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.5,
+                          width: MediaQuery.of(context).size.width * 0.35,
                           child: Center(
                             child: InkWell(
                               onTap: () async {
@@ -200,10 +203,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                   });
                                   ScaffoldMessenger.of(context).showSnackBar(
                                       snackBar(
-                                          'Alert! Your email is badly formatted'));
+                                          'Alert! Your email is formatted incorrectly'));
                                 } else {
                                   try {
-                                    //if Every condition fulfills then sign in user and store details of user to mobile local storage
+                                    // If every condition fulfills then sign in user and store details of user to mobile local storage
                                     FirebaseAuth _auth = FirebaseAuth.instance;
                                     await _auth
                                         .signInWithEmailAndPassword(
@@ -245,12 +248,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                     color: const Color(0xff2F00F9),
                                     borderRadius: BorderRadius.circular(10.r)),
                                 padding: EdgeInsets.symmetric(
-                                  vertical: 14.h,
+                                  vertical: 10.h,
                                 ),
                                 child: Text(
                                   'Login',
                                   style: TextStyle(
-                                      color: Colors.white, fontSize: 16.sp),
+                                      color: Colors.white, fontSize: 6.sp),
                                 ),
                               ),
                             ),
@@ -265,7 +268,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             Text(
                               'New user?',
                               style: TextStyle(
-                                  fontSize: 10.sp,
+                                  fontSize: 4.sp,
                                   color: const Color(0xff737373)),
                             ),
                             InkWell(
@@ -276,12 +279,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                   '  Register',
                                   style: TextStyle(
                                       color: const Color(0xffE98445),
-                                      fontSize: 10.sp),
+                                      fontSize: 4.sp),
                                 )),
                             Text(
                               ' OR ',
                               style: TextStyle(
-                                  color: Colors.black54, fontSize: 10.sp),
+                                  color: Colors.black54, fontSize: 4.sp),
                             ),
                             InkWell(
                                 onTap: () {
@@ -289,12 +292,14 @@ class _LoginScreenState extends State<LoginScreen> {
                                   Get.to(() => const MyApp());
                                 },
                                 child: Text(
-                                  ' Guest Account',
+                                  'Guest Account',
                                   style: TextStyle(
-                                      color: Color(0xff2F00F9),
-                                      fontSize: 10.sp),
+                                      color: Color(0xff2F00F9), fontSize: 4.sp),
                                 )),
                           ],
+                        ),
+                        SizedBox(
+                          height: 20.h,
                         )
                       ],
                     ),
@@ -319,11 +324,11 @@ class _LoginScreenState extends State<LoginScreen> {
           borderRadius: BorderRadius.circular(10.r)),
       padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 5.h),
       margin: EdgeInsets.symmetric(horizontal: 2.w),
-      width: MediaQuery.of(context).size.width * 0.5,
+      width: MediaQuery.of(context).size.width * 0.35,
       child: TextField(
         style: TextStyle(
             color: Colors.black54,
-            fontSize: 14.sp,
+            fontSize: 6.sp,
             fontWeight: FontWeight.normal),
         controller: controller,
         decoration: InputDecoration(
@@ -332,7 +337,7 @@ class _LoginScreenState extends State<LoginScreen> {
             border: InputBorder.none,
             hintText: hint,
             hintStyle: TextStyle(
-                fontSize: 14.sp,
+                fontSize: 6.sp,
                 color: const Color(0xff737373),
                 fontWeight: FontWeight.normal)),
       ),

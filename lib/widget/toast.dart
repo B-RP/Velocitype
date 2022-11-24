@@ -42,6 +42,6 @@ Widget buildTextField(
 Widget buildLogo() {
   return SizedBox(
     height: 120.h,
-    child: Image.asset('assets/images/logo.png'),
+    child: Image.asset('assets/images/new.PNG'),
   );
 }

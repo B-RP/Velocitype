@@ -20,7 +20,7 @@ import 'data.dart';
 import 'menu.dart';
 
 Future<void> main() async {
-  // These two line are used to initialize the firebase database when app starts
+  // These two lines initialize the Firebase database when app starts
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     // options: DefaultFirebaseOptions.currentPlatform,
@@ -36,10 +36,11 @@ Future<void> main() async {
     ),
   );
   runApp(const GetMaterialApp(
-      home: SplashScreen())); // App moves to the splash screen
+      // App moves to splash screen
+      home: SplashScreen()));
 }
 
-// This MyApp screen is actually home page when user login then this screen will open
+// HOME PAGE
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
@@ -49,12 +50,12 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   // This _wordController is an instance of Words Controller
-  // it keep the record of words and current word index and number of right words
+  // it keeps the record of words and current word index and number of right words
   final WordsController _wordsController = Get.put(WordsController());
 
   // When this screen will open the first function which will call is the initState function,'
-  // it will help to get the require things necessary to initialize elements of screen
-  // In our case we are setting the current word index to 0 means first and score is set to 0
+  // it will help get what is necessary to initialize elements of screen
+  // In this case, the current word index and score is being initialized to 0
   @override
   void initState() {
     // TODO: implement initState
@@ -66,7 +67,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: 'Tempo App',
+        title: 'Velocitype',
         theme: ThemeData(
             primaryColor: Colors.redAccent, primaryColorDark: Colors.red
             //colorSchemeSeed: const Color.fromARGB(255, 255, 255, 255),
@@ -76,7 +77,7 @@ class _MyAppState extends State<MyApp> {
   }
 }
 
-//Main application
+// Main application
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
   @override
@@ -226,339 +227,935 @@ class _InteractionRowState extends State<InteractionRow> {
   final WordsController _wordsController = Get.put(WordsController());
 
   final UserController _userController = Get.put(
-      UserController()); // This is user controller it keep the record of results of user and other details of user
+      UserController()); // This is user controller it keeps the record of results of user and other details of user
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Obx widget listen the runtime changes of the getx controllers
-        // in work case _wordController changes will be listen by this obx widget
-        //Visibility widget is use when you want to show and hide some widget in
-        // particular condition in our case we want to hide the input text field and other element of row when
-        // all answers will be given
+        // USING OBX WIDGET
+        // Which gets the runtime changes of the GetX controllers
+        // In this case,OBX widget will get _wordController changes
+        // USING VISIBILITY WIDGET
+        // Which shows and hides some widget in particular
+        // In this case, the input text field and other element of row when all answers are given
         Obx(() => Visibility(
               visible: _wordsController.index.value < 24,
               child:
                   Row(mainAxisAlignment: MainAxisAlignment.center, children: <
                       Widget>[
                 SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.2,
+                  width: MediaQuery.of(context).size.width * 0.35,
                   child: TextField(
                       onChanged: (text) {
                         if (text[text.length - 1] == " ") {
                           _wordsController.checkWord(text);
                           textFieldController.clear();
                         }
-                        if (_wordsController.index.value == 24 &&
-                            _userController.isGuest.value == false) {
+                        if (_wordsController.index.value == 24) {
                           // Test > user_email > results > recordId > time and score
-                          // Try keyword handles the runtime exception, if any occur then it will shift the control
-                          // to the catch block
+                          // Try keyword handles the runtime exception
+                          // If any occur then it will shift control to the catch block
                           try {
-                            FirebaseFirestore.instance
-                                .collection("tests")
-                                .doc(_userController.loginUser.value.email)
-                                .collection("results")
-                                .add({
-                              "score": _wordsController.score.value,
-                              "time": DateTime.now().toString(),
-                            }).whenComplete(() {
-                              // when record will inserted then toast will show on screen
-                              // with message that result added successfully
-                              //Adding the new record to user controller
-                              _userController.records.add(ResultRecord(
-                                  score: _wordsController.score.value,
-                                  time: DateTime.now().toString()));
-                              log("Score Card");
-                              showDialog<void>(
-                                context: context,
-                                barrierDismissible:
-                                    false, // user must tap button!
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    title: const Text('Score Card'),
-                                    content: SingleChildScrollView(
-                                      child: Column(
-                                        children: <Widget>[
-                                          SizedBox(
-                                            height: 30.0,
-                                          ),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceEvenly,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: const [
-                                              Text(
-                                                "Date ",
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                width: 10.0,
-                                              ),
-                                              Text(
-                                                "Time ",
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceEvenly,
-                                            children: [
-                                              Text(
-                                                //THis line will use to convert String of time into Date and Tme Format and then converting it into 2022-12-28 this format
-                                                DateFormat('yyyy-MM-dd').format(
-                                                    DateTime.parse(
-                                                        _userController.records
-                                                            .last.time)),
-                                              ),
-                                              const SizedBox(
-                                                width: 10.0,
-                                              ),
-                                              Text(
-                                                  // Get exact time from Date and Time
-                                                  /*DateFormat.Hms().format(DateTime.parse(
-                                          _userController.records.last.time)),*/
-                                                  "40 sec"),
-                                            ],
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                top: 12.0),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.spaceEvenly,
+                            if ((_userController.isGuest.value == false)) {
+                              FirebaseFirestore.instance
+                                  .collection("tests")
+                                  .doc(_userController.loginUser.value.email)
+                                  .collection("results")
+                                  .add({
+                                "score": _wordsController.score.value,
+                                "time": DateTime.now().toString(),
+                              }).whenComplete(() {
+                                // When record will inserted then toast will show on screen,
+                                // with message that result added successfully
+                                // Adding the new record to user controller
+                                _userController.records.add(ResultRecord(
+                                    score: _wordsController.score.value,
+                                    time: DateTime.now().toString()));
+                                log("Score Card");
+                                showDialog<void>(
+                                  context: context,
+                                  barrierDismissible:
+                                      false, // user must tap button!
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      content: SizedBox(
+                                        width:
+                                            MediaQuery.of(context).size.width /
+                                                2,
+                                        /*  height:
+                                          MediaQuery.of(context).size.height,*/
+                                        child: SingleChildScrollView(
+                                          child: Container(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                .40,
+                                            child: Column(
                                               children: [
-                                                Row(
-                                                  children: [
-                                                    const Text(
-                                                      "Correct: ",
-                                                      style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                    const SizedBox(
-                                                      width: 10.0,
-                                                    ),
-                                                    Text(
-                                                      //index hold the values of current element
-                                                      _userController
-                                                          .records.last.score
-                                                          .toString(),
-                                                    ),
-                                                  ],
-                                                ),
-                                                Row(
-                                                  children: [
-                                                    const Text(
-                                                      "Wrong: ",
-                                                      style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                    const SizedBox(
-                                                      width: 10.0,
-                                                    ),
-                                                    Text(
-                                                      //index hold the values of current element
-                                                      '${40 - _userController.records.last.score}',
-                                                    ),
-                                                  ],
-                                                )
-                                              ],
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                top: 12.0),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.spaceEvenly,
-                                              children: [
-                                                Row(
-                                                  children: [
-                                                    const Text(
-                                                      "Key Acc: ",
-                                                      style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                    const SizedBox(
-                                                      width: 10.0,
-                                                    ),
-                                                    Text(
-                                                      //index hold the values of current element
-                                                      _data
-                                                          .calcKeyAccuracy()
-                                                          .toString(),
-                                                    ),
-                                                  ],
-                                                ),
-                                                Row(
-                                                  children: [
-                                                    const Text(
-                                                      "Word Acc: ",
-                                                      style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                    const SizedBox(
-                                                      width: 10.0,
-                                                    ),
-                                                    Text(
-                                                        //index hold the values of current element
-                                                        _data
-                                                            .calcWordAccuracy()
-                                                            .toString()),
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 12.0),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.spaceEvenly,
-                                              children: [
-                                                Row(
-                                                  children: [
-                                                    const Text(
-                                                      "Percentage: ",
-                                                      style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                    const SizedBox(
-                                                      width: 10.0,
-                                                    ),
-                                                    Text(
-                                                      "${(_userController.records.last.score * 100) ~/ 40}%", //
-                                                      style: TextStyle(
-                                                          color: ((_userController
-                                                                              .records
-                                                                              .last
-                                                                              .score *
-                                                                          100) ~/
-                                                                      40) <
-                                                                  50
-                                                              ? Colors.red
-                                                              : Colors.green,
-                                                          fontSize: 18,
-                                                          fontWeight:
-                                                              FontWeight.bold),
-                                                    ),
-                                                  ],
-                                                ),
                                                 Padding(
                                                   padding: const EdgeInsets
                                                           .symmetric(
-                                                      vertical: 12.0),
+                                                      vertical: 8.0,
+                                                      horizontal: 8.0),
                                                   child: Row(
                                                     children: [
-                                                      const Text(
-                                                        "WPM: ",
-                                                        style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                        ),
-                                                      ),
-                                                      const SizedBox(
-                                                        width: 10.0,
-                                                      ),
-                                                      Text(
-                                                        //"${(_userController.records.elementAt(index).score * 100) ~/ 40}%",
-                                                        _data
-                                                            .calcWPM(10.0)
-                                                            .toString(),
-                                                        style: TextStyle(
-                                                            color: ((_userController.records.last.score *
-                                                                            100) ~/
-                                                                        40) <
-                                                                    50
-                                                                ? Colors.red
-                                                                : Colors.green,
-                                                            fontSize: 18,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .bold),
-                                                      ),
+                                                      const Spacer(),
+                                                      GestureDetector(
+                                                          onTap: () {
+                                                            Navigator.of(
+                                                                    context)
+                                                                .pop();
+                                                            Get.back(); // This line closes the pop up
+                                                          },
+                                                          child: Icon(
+                                                            Icons.close,
+                                                            size: 35,
+                                                            color: Colors.black,
+                                                          ))
                                                     ],
+                                                  ),
+                                                ),
+                                                Container(
+                                                  margin: const EdgeInsets
+                                                          .symmetric(
+                                                      horizontal: 50.0),
+                                                  child: Card(
+                                                    //Card with circular border
+                                                    color: Colors.white
+                                                        .withOpacity(0.75),
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              0.0),
+                                                    ),
+                                                    child: Padding(
+                                                      padding: const EdgeInsets
+                                                              .symmetric(
+                                                          horizontal: 10.0,
+                                                          vertical: 10.0),
+                                                      child: Column(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          const Padding(
+                                                            padding:
+                                                                EdgeInsets.only(
+                                                                    bottom:
+                                                                        10.0),
+                                                            child: Center(
+                                                                child: Text(
+                                                              "70 WPM",
+                                                              style: TextStyle(
+                                                                  fontSize: 28,
+                                                                  color: Color(
+                                                                      0xFF0001AC),
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold),
+                                                            )),
+                                                          ),
+                                                          const SizedBox(
+                                                            height: 10.0,
+                                                          ),
+                                                          Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .spaceEvenly,
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: const [
+                                                              Text(
+                                                                "Date ",
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
+                                                              ),
+                                                              SizedBox(
+                                                                width: 10.0,
+                                                              ),
+                                                              Text(
+                                                                "Time ",
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .spaceEvenly,
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              Text(
+                                                                // This line converts Date's format to 2022-12-28
+                                                                DateFormat(
+                                                                        'yyyy-MM-dd')
+                                                                    .format(DateTime.parse(_userController
+                                                                        .records
+                                                                        .last
+                                                                        .time)),
+                                                              ),
+                                                              const SizedBox(
+                                                                width: 10.0,
+                                                              ),
+                                                              const Text(
+                                                                // Get exact time from Date and Time
+                                                                /*DateFormat.Hms().format(DateTime.parse(
+                                        _userController.records
+                                                  .elementAt(index)
+                                                  .time))*/
+                                                                "40 sec",
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                        .only(
+                                                                    top: 12.0),
+                                                            child: Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceEvenly,
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                Row(
+                                                                  children: [
+                                                                    const Text(
+                                                                      "Keystrokes: ",
+                                                                      style:
+                                                                          TextStyle(
+                                                                        fontWeight:
+                                                                            FontWeight.bold,
+                                                                      ),
+                                                                    ),
+                                                                    const SizedBox(
+                                                                      width:
+                                                                          40.0,
+                                                                    ),
+                                                                    Text(
+                                                                      //index hold the values of current element
+                                                                      _data
+                                                                          .calcKeyAccuracy()
+                                                                          .toString(),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                                Row(
+                                                                  children: [
+                                                                    const Text(
+                                                                      "Word Acc: ",
+                                                                      style:
+                                                                          TextStyle(
+                                                                        fontWeight:
+                                                                            FontWeight.bold,
+                                                                      ),
+                                                                    ),
+                                                                    const SizedBox(
+                                                                      width:
+                                                                          10.0,
+                                                                    ),
+                                                                    Text(
+                                                                        //index hold the values of current element
+                                                                        _data
+                                                                            .calcWordAccuracy()
+                                                                            .toString()),
+                                                                  ],
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                        .symmetric(
+                                                                    vertical:
+                                                                        12.0),
+                                                            child: Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceEvenly,
+                                                              children: [
+                                                                Row(
+                                                                  children: [
+                                                                    const Text(
+                                                                      "Accuracy: ",
+                                                                      style:
+                                                                          TextStyle(
+                                                                        fontWeight:
+                                                                            FontWeight.bold,
+                                                                      ),
+                                                                    ),
+                                                                    const SizedBox(
+                                                                      width:
+                                                                          40.0,
+                                                                    ),
+                                                                    Text(
+                                                                      "${(_userController.records.last.score * 100) ~/ 24}%",
+                                                                      style: TextStyle(
+                                                                          color: ((_userController.records.last.score * 100) ~/ 24) < 50
+                                                                              ? Colors
+                                                                                  .red
+                                                                              : Colors
+                                                                                  .green,
+                                                                          fontSize:
+                                                                              18,
+                                                                          fontWeight:
+                                                                              FontWeight.bold),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                                Padding(
+                                                                  padding: const EdgeInsets
+                                                                          .symmetric(
+                                                                      vertical:
+                                                                          12.0),
+                                                                  child: Row(
+                                                                    children: [
+                                                                      const Text(
+                                                                        "WPM: ",
+                                                                        style:
+                                                                            TextStyle(
+                                                                          fontWeight:
+                                                                              FontWeight.bold,
+                                                                        ),
+                                                                      ),
+                                                                      const SizedBox(
+                                                                        width:
+                                                                            10.0,
+                                                                      ),
+                                                                      Text(
+                                                                        //"${(_userController.records.last.score * 100) ~/ 40}%",
+                                                                        _data
+                                                                            .calcWPM(20.0)
+                                                                            .toString(),
+                                                                        style: TextStyle(
+                                                                            color: ((_userController.records.last.score * 100) ~/ 24) < 50
+                                                                                ? Colors.red
+                                                                                : Colors.green,
+                                                                            fontSize: 18,
+                                                                            fontWeight: FontWeight.bold),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                          Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .spaceEvenly,
+                                                            children: [
+                                                              Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                            .only(
+                                                                        top:
+                                                                            12.0),
+                                                                child: Row(
+                                                                  children: [
+                                                                    const Text(
+                                                                      "Correct Words: ",
+                                                                      style:
+                                                                          TextStyle(
+                                                                        fontWeight:
+                                                                            FontWeight.bold,
+                                                                      ),
+                                                                    ),
+                                                                    const SizedBox(
+                                                                      width:
+                                                                          40.0,
+                                                                    ),
+                                                                    Text(
+                                                                      //index hold the values of current element
+                                                                      _userController
+                                                                          .records
+                                                                          .last
+                                                                          .score
+                                                                          .toString(),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                              Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                            .only(
+                                                                        top:
+                                                                            12.0),
+                                                                child: Row(
+                                                                  children: [
+                                                                    const Text(
+                                                                      "Wrong words: ",
+                                                                      style:
+                                                                          TextStyle(
+                                                                        fontWeight:
+                                                                            FontWeight.bold,
+                                                                      ),
+                                                                    ),
+                                                                    const SizedBox(
+                                                                      width:
+                                                                          40.0,
+                                                                    ),
+                                                                    Text(
+                                                                      //index hold the values of current element
+                                                                      '${24 - _userController.records.last.score}',
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
                                                   ),
                                                 ),
                                               ],
                                             ),
                                           ),
-                                        ],
+                                        ),
                                       ),
-                                    ),
-                                    actions: <Widget>[
-                                      TextButton(
-                                        child: const Text('Again Test'),
-                                        onPressed: () {
-                                          Navigator.of(context)
-                                              .pop(); // This line close the pop up
-                                          _wordsController.index.value = 0;
-                                          _wordsController.score.value = 0;
-                                          //Code to open screen MyApp
-                                          Get.off(() => const MyApp());
-                                        },
-                                      ),
-                                      TextButton(
-                                        child: const Text('Past Results'),
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                          _wordsController.index.value = 0;
-                                          _wordsController.score.value = 0;
-                                          //Code to open screen MyApp
-                                          Get.off(() => const MyApp());
-                                          showGeneralDialog(
-                                            context: context,
-                                            pageBuilder: (ctx, a1, a2) {
-                                              return Menu(context);
-                                            },
-                                            transitionBuilder: (context,
-                                                animation,
-                                                secondaryAnimation,
-                                                child) {
-                                              const begin = Offset(0.0, 1.0);
-                                              const end = Offset.zero;
-                                              const curve = Curves.ease;
+                                      actions: <Widget>[
+                                        TextButton(
+                                          child: const Text(
+                                            'Take test again',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w600,
+                                                color: Color(0xff2F00F9)),
+                                          ),
+                                          onPressed: () {
+                                            Navigator.of(context)
+                                                .pop(); // This line close the pop up
+                                            _wordsController.index.value = 0;
+                                            _wordsController.score.value = 0;
+                                            //Code to open screen MyApp
+                                            Get.off(() => const MyApp());
+                                          },
+                                        ),
+                                        (_userController.isGuest.value == false)
+                                            ? TextButton(
+                                                child: const Text(
+                                                  'Show past results',
+                                                  style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color: Color(0xff2F00F9)),
+                                                ),
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                  _wordsController.index.value =
+                                                      0;
+                                                  _wordsController.score.value =
+                                                      0;
+                                                  //Code to open screen MyApp
+                                                  Get.off(() => const MyApp());
+                                                  showGeneralDialog(
+                                                    context: context,
+                                                    pageBuilder: (ctx, a1, a2) {
+                                                      return Menu(context);
+                                                    },
+                                                    transitionBuilder: (context,
+                                                        animation,
+                                                        secondaryAnimation,
+                                                        child) {
+                                                      const begin =
+                                                          Offset(0.0, 1.0);
+                                                      const end = Offset.zero;
+                                                      const curve = Curves.ease;
 
-                                              var tween = Tween(
-                                                      begin: begin, end: end)
-                                                  .chain(
-                                                      CurveTween(curve: curve));
+                                                      var tween = Tween(
+                                                              begin: begin,
+                                                              end: end)
+                                                          .chain(CurveTween(
+                                                              curve: curve));
 
-                                              return SlideTransition(
-                                                position:
-                                                    animation.drive(tween),
-                                                child: child,
-                                              );
-                                            },
-                                          );
-                                        },
+                                                      return SlideTransition(
+                                                        position: animation
+                                                            .drive(tween),
+                                                        child: child,
+                                                      );
+                                                    },
+                                                  );
+                                                },
+                                              )
+                                            : const SizedBox(),
+                                      ],
+                                    );
+                                  },
+                                );
+                                log("Show end Alert Dialog");
+                              });
+                            } else {
+                              {
+                                // When record will inserted then toast will show on screen
+                                // with message that result added successfully
+                                // Adding the new record to user controller
+                                _userController.records.add(ResultRecord(
+                                    score: _wordsController.score.value,
+                                    time: DateTime.now().toString()));
+                                log("Score Card");
+                                showDialog<void>(
+                                  context: context,
+                                  barrierDismissible:
+                                      false, // user must tap button!
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      content: SizedBox(
+                                        width:
+                                            MediaQuery.of(context).size.width /
+                                                2,
+                                        /*  height:
+                                          MediaQuery.of(context).size.height,*/
+                                        child: SingleChildScrollView(
+                                          child: Container(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                .40,
+                                            child: Column(
+                                              children: [
+                                                Padding(
+                                                  padding: const EdgeInsets
+                                                          .symmetric(
+                                                      vertical: 8.0,
+                                                      horizontal: 8.0),
+                                                  child: Row(
+                                                    children: [
+                                                      const Spacer(),
+                                                      GestureDetector(
+                                                          onTap: () {
+                                                            Navigator.of(
+                                                                    context)
+                                                                .pop();
+                                                            Get.back(); // This line close the pop up
+                                                            _wordsController
+                                                                .index
+                                                                .value = 0;
+                                                            _wordsController
+                                                                .score
+                                                                .value = 0;
+                                                            //Code to open screen MyApp
+                                                            Get.off(() =>
+                                                                const MyApp());
+                                                          },
+                                                          child: Icon(
+                                                            Icons.close,
+                                                            size: 35,
+                                                            color: Colors.black,
+                                                          ))
+                                                    ],
+                                                  ),
+                                                ),
+                                                Container(
+                                                  margin: const EdgeInsets
+                                                          .symmetric(
+                                                      horizontal: 50.0),
+                                                  child: Card(
+                                                    //Card with circular border
+                                                    color: Colors.white
+                                                        .withOpacity(0.75),
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              0.0),
+                                                    ),
+                                                    child: Padding(
+                                                      padding: const EdgeInsets
+                                                              .symmetric(
+                                                          horizontal: 10.0,
+                                                          vertical: 10.0),
+                                                      child: Column(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          const Padding(
+                                                            padding:
+                                                                EdgeInsets.only(
+                                                                    bottom:
+                                                                        10.0),
+                                                            child: Center(
+                                                                child: Text(
+                                                              "70 WPM",
+                                                              style: TextStyle(
+                                                                  fontSize: 28,
+                                                                  color: Color(
+                                                                      0xFF0001AC),
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold),
+                                                            )),
+                                                          ),
+                                                          const SizedBox(
+                                                            height: 10.0,
+                                                          ),
+                                                          Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .spaceEvenly,
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: const [
+                                                              Text(
+                                                                "Date ",
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
+                                                              ),
+                                                              SizedBox(
+                                                                width: 10.0,
+                                                              ),
+                                                              Text(
+                                                                "Time ",
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .spaceEvenly,
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              Text(
+                                                                // This line will use to convert String of time into Date and Time Format and then converting it into 2022-12-28 this format
+                                                                DateFormat(
+                                                                        'yyyy-MM-dd')
+                                                                    .format(DateTime.parse(_userController
+                                                                        .records
+                                                                        .last
+                                                                        .time)),
+                                                              ),
+                                                              const SizedBox(
+                                                                width: 10.0,
+                                                              ),
+                                                              const Text(
+                                                                // Get exact time from Date and Time
+                                                                /*DateFormat.Hms().format(DateTime.parse(
+                                        _userController.records
+                                                  .elementAt(index)
+                                                  .time))*/
+                                                                "40 sec",
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                        .only(
+                                                                    top: 12.0),
+                                                            child: Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceEvenly,
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                Row(
+                                                                  children: [
+                                                                    const Text(
+                                                                      "Keystrokes: ",
+                                                                      style:
+                                                                          TextStyle(
+                                                                        fontWeight:
+                                                                            FontWeight.bold,
+                                                                      ),
+                                                                    ),
+                                                                    const SizedBox(
+                                                                      width:
+                                                                          40.0,
+                                                                    ),
+                                                                    Text(
+                                                                      //index hold the values of current element
+                                                                      _data
+                                                                          .calcKeyAccuracy()
+                                                                          .toString(),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                                Row(
+                                                                  children: [
+                                                                    const Text(
+                                                                      "Word Acc: ",
+                                                                      style:
+                                                                          TextStyle(
+                                                                        fontWeight:
+                                                                            FontWeight.bold,
+                                                                      ),
+                                                                    ),
+                                                                    const SizedBox(
+                                                                      width:
+                                                                          10.0,
+                                                                    ),
+                                                                    Text(
+                                                                        //index hold the values of current element
+                                                                        _data
+                                                                            .calcWordAccuracy()
+                                                                            .toString()),
+                                                                  ],
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                        .symmetric(
+                                                                    vertical:
+                                                                        12.0),
+                                                            child: Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceEvenly,
+                                                              children: [
+                                                                Row(
+                                                                  children: [
+                                                                    const Text(
+                                                                      "Accuracy: ",
+                                                                      style:
+                                                                          TextStyle(
+                                                                        fontWeight:
+                                                                            FontWeight.bold,
+                                                                      ),
+                                                                    ),
+                                                                    const SizedBox(
+                                                                      width:
+                                                                          40.0,
+                                                                    ),
+                                                                    Text(
+                                                                      "${(_userController.records.last.score * 100) ~/ 24}%",
+                                                                      style: TextStyle(
+                                                                          color: ((_userController.records.last.score * 100) ~/ 24) < 50
+                                                                              ? Colors
+                                                                                  .red
+                                                                              : Colors
+                                                                                  .green,
+                                                                          fontSize:
+                                                                              18,
+                                                                          fontWeight:
+                                                                              FontWeight.bold),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                                Padding(
+                                                                  padding: const EdgeInsets
+                                                                          .symmetric(
+                                                                      vertical:
+                                                                          12.0),
+                                                                  child: Row(
+                                                                    children: [
+                                                                      const Text(
+                                                                        "WPM: ",
+                                                                        style:
+                                                                            TextStyle(
+                                                                          fontWeight:
+                                                                              FontWeight.bold,
+                                                                        ),
+                                                                      ),
+                                                                      const SizedBox(
+                                                                        width:
+                                                                            10.0,
+                                                                      ),
+                                                                      Text(
+                                                                        //"${(_userController.records.last.score * 100) ~/ 40}%",
+                                                                        _data
+                                                                            .calcWPM(20.0)
+                                                                            .toString(),
+                                                                        style: TextStyle(
+                                                                            color: ((_userController.records.last.score * 100) ~/ 24) < 50
+                                                                                ? Colors.red
+                                                                                : Colors.green,
+                                                                            fontSize: 18,
+                                                                            fontWeight: FontWeight.bold),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                          Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .spaceEvenly,
+                                                            children: [
+                                                              Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                            .only(
+                                                                        top:
+                                                                            12.0),
+                                                                child: Row(
+                                                                  children: [
+                                                                    const Text(
+                                                                      "Correct Words: ",
+                                                                      style:
+                                                                          TextStyle(
+                                                                        fontWeight:
+                                                                            FontWeight.bold,
+                                                                      ),
+                                                                    ),
+                                                                    const SizedBox(
+                                                                      width:
+                                                                          40.0,
+                                                                    ),
+                                                                    Text(
+                                                                      //index hold the values of current element
+                                                                      _userController
+                                                                          .records
+                                                                          .last
+                                                                          .score
+                                                                          .toString(),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                              Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                            .only(
+                                                                        top:
+                                                                            12.0),
+                                                                child: Row(
+                                                                  children: [
+                                                                    const Text(
+                                                                      "Wrong words: ",
+                                                                      style:
+                                                                          TextStyle(
+                                                                        fontWeight:
+                                                                            FontWeight.bold,
+                                                                      ),
+                                                                    ),
+                                                                    const SizedBox(
+                                                                      width:
+                                                                          40.0,
+                                                                    ),
+                                                                    Text(
+                                                                      //index hold the values of current element
+                                                                      '${24 - _userController.records.last.score}',
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
                                       ),
-                                    ],
-                                  );
-                                },
-                              );
-                              log("show end Alert Dialog");
-                            });
+                                      actions: <Widget>[
+                                        TextButton(
+                                          child: const Text(
+                                            'Take test again',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w600,
+                                                color: Color(0xff2F00F9)),
+                                          ),
+                                          onPressed: () {
+                                            Navigator.of(context)
+                                                .pop(); // This line close the pop up
+                                            _wordsController.index.value = 0;
+                                            _wordsController.score.value = 0;
+                                            //Code to open screen MyApp
+                                            Get.off(() => const MyApp());
+                                          },
+                                        ),
+                                        (_userController.isGuest.value == false)
+                                            ? TextButton(
+                                                child: const Text(
+                                                  'Show past results',
+                                                  style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color: Color(0xff2F00F9)),
+                                                ),
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                  _wordsController.index.value =
+                                                      0;
+                                                  _wordsController.score.value =
+                                                      0;
+                                                  //Code to open screen MyApp
+                                                  Get.off(() => const MyApp());
+                                                  showGeneralDialog(
+                                                    context: context,
+                                                    pageBuilder: (ctx, a1, a2) {
+                                                      return Menu(context);
+                                                    },
+                                                    transitionBuilder: (context,
+                                                        animation,
+                                                        secondaryAnimation,
+                                                        child) {
+                                                      const begin =
+                                                          Offset(0.0, 1.0);
+                                                      const end = Offset.zero;
+                                                      const curve = Curves.ease;
+
+                                                      var tween = Tween(
+                                                              begin: begin,
+                                                              end: end)
+                                                          .chain(CurveTween(
+                                                              curve: curve));
+
+                                                      return SlideTransition(
+                                                        position: animation
+                                                            .drive(tween),
+                                                        child: child,
+                                                      );
+                                                    },
+                                                  );
+                                                },
+                                              )
+                                            : const SizedBox(),
+                                      ],
+                                    );
+                                  },
+                                );
+                                log("Show end Alert Dialog");
+                              }
+                            }
                           } catch (e) {
                             // If any exception occurs in try block then this catch block will execute and
-                            //in our case exception will show in red toast
+                            // In this case, exception will show in red toast
                             Fluttertoast.showToast(
                                 msg: e.toString(),
                                 toastLength: Toast.LENGTH_SHORT,
@@ -625,330 +1222,6 @@ class _InteractionRowState extends State<InteractionRow> {
         const SizedBox(
           height: 20.0,
         ),
-        /* Obx(() => Center(
-                child: Visibility(
-              visible: _wordsController.index.value == 24,
-              child: Text(
-                "Score: ${_wordsController.score}/24",
-                style: TextStyle(color: Colors.white, fontSize: 24),
-              ),
-            ))),*/
-
-        //When user typed all 24 words and user will not be guest user than score with respective time
-        //will be enter to firebase
-        /*    Obx(() => Center(
-                child: Visibility(
-              visible: _wordsController.index.value == 24 &&
-                  _userController.isGuest.value == false,
-              child: ElevatedButton(
-                onPressed: () {
-                  // Test > user_email > results > recordId > time and score
-                  // Try keyword handles the runtime exception, if any occur then it will shift the control
-                  // to the catch block
-                  try {
-                    FirebaseFirestore.instance
-                        .collection("tests")
-                        .doc(_userController.loginUser.value.email)
-                        .collection("results")
-                        .add({
-                      "score": _wordsController.score.value,
-                      "time": DateTime.now().toString(),
-                    }).whenComplete(() {
-                      // when record will inserted then toast will show on screen
-                      // with message that result added successfully
-                      //Adding the new record to user controller
-                      _userController.records.add(ResultRecord(
-                          score: _wordsController.score.value,
-                          time: DateTime.now().toString()));
-                      log("Score Card");
-                      showDialog<void>(
-                        context: context,
-                        barrierDismissible: false, // user must tap button!
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: const Text('Score Card'),
-                            content: SingleChildScrollView(
-                              child: Column(
-                                children: <Widget>[
-                                  SizedBox(
-                                    height: 30.0,
-                                  ),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: const [
-                                      Text(
-                                        "Date ",
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        width: 10.0,
-                                      ),
-                                      Text(
-                                        "Time ",
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      Text(
-                                        //THis line will use to convert String of time into Date and Tme Format and then converting it into 2022-12-28 this format
-                                        DateFormat('yyyy-MM-dd').format(
-                                            DateTime.parse(_userController
-                                                .records.last.time)),
-                                      ),
-                                      const SizedBox(
-                                        width: 10.0,
-                                      ),
-                                      Text(
-                                          // Get exact time from Date and Time
-                                          */ /*DateFormat.Hms().format(DateTime.parse(
-                                            _userController.records.last.time)),*/ /*
-                                          "40 sec"),
-                                    ],
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 12.0),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            const Text(
-                                              "Correct: ",
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            const SizedBox(
-                                              width: 10.0,
-                                            ),
-                                            Text(
-                                              //index hold the values of current element
-                                              _userController.records.last.score
-                                                  .toString(),
-                                            ),
-                                          ],
-                                        ),
-                                        Row(
-                                          children: [
-                                            const Text(
-                                              "Wrong: ",
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            const SizedBox(
-                                              width: 10.0,
-                                            ),
-                                            Text(
-                                              //index hold the values of current element
-                                              '${40 - _userController.records.last.score}',
-                                            ),
-                                          ],
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 12.0),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            const Text(
-                                              "Key Acc: ",
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            const SizedBox(
-                                              width: 10.0,
-                                            ),
-                                            Text(
-                                              //index hold the values of current element
-                                              _data
-                                                  .calcKeyAccuracy()
-                                                  .toString(),
-                                            ),
-                                          ],
-                                        ),
-                                        Row(
-                                          children: [
-                                            const Text(
-                                              "Word Acc: ",
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            const SizedBox(
-                                              width: 10.0,
-                                            ),
-                                            Text(
-                                                //index hold the values of current element
-                                                _data
-                                                    .calcWordAccuracy()
-                                                    .toString()),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 12.0),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            const Text(
-                                              "Percentage: ",
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            const SizedBox(
-                                              width: 10.0,
-                                            ),
-                                            Text(
-                                              "${(_userController.records.last.score * 100) ~/ 40}%", //
-                                              style: TextStyle(
-                                                  color: ((_userController
-                                                                      .records
-                                                                      .last
-                                                                      .score *
-                                                                  100) ~/
-                                                              40) <
-                                                          50
-                                                      ? Colors.red
-                                                      : Colors.green,
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                          ],
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 12.0),
-                                          child: Row(
-                                            children: [
-                                              const Text(
-                                                "WPM: ",
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                              const SizedBox(
-                                                width: 10.0,
-                                              ),
-                                              Text(
-                                                //"${(_userController.records.elementAt(index).score * 100) ~/ 40}%",
-                                                _data.calcWPM(10.0).toString(),
-                                                style: TextStyle(
-                                                    color: ((_userController
-                                                                        .records
-                                                                        .last
-                                                                        .score *
-                                                                    100) ~/
-                                                                40) <
-                                                            50
-                                                        ? Colors.red
-                                                        : Colors.green,
-                                                    fontSize: 18,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            actions: <Widget>[
-                              TextButton(
-                                child: const Text('Again Test'),
-                                onPressed: () {
-                                  Navigator.of(context)
-                                      .pop(); // This line close the pop up
-                                  _wordsController.index.value = 0;
-                                  _wordsController.score.value = 0;
-                                  //Code to open screen MyApp
-                                  Get.off(() => const MyApp());
-                                },
-                              ),
-                              TextButton(
-                                child: const Text('Past Results'),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                  _wordsController.index.value = 0;
-                                  _wordsController.score.value = 0;
-                                  //Code to open screen MyApp
-                                  Get.off(() => const MyApp());
-                                  showGeneralDialog(
-                                    context: context,
-                                    pageBuilder: (ctx, a1, a2) {
-                                      return Menu(context);
-                                    },
-                                    transitionBuilder: (context, animation,
-                                        secondaryAnimation, child) {
-                                      const begin = Offset(0.0, 1.0);
-                                      const end = Offset.zero;
-                                      const curve = Curves.ease;
-
-                                      var tween = Tween(begin: begin, end: end)
-                                          .chain(CurveTween(curve: curve));
-
-                                      return SlideTransition(
-                                        position: animation.drive(tween),
-                                        child: child,
-                                      );
-                                    },
-                                  );
-                                },
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                      log("show end Alert Dialog");
-                    });
-                  } catch (e) {
-                    // If any exception occurs in try block then this catch block will execute and
-                    //in our case exception will show in red toast
-                    Fluttertoast.showToast(
-                        msg: e.toString(),
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.CENTER,
-                        timeInSecForIosWeb: 1,
-                        backgroundColor: Colors.red,
-                        textColor: Colors.white,
-                        fontSize: 16.0);
-                  }
-                },
-                child: const Padding(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 30.00, vertical: 8.0),
-                  child: Text("Submit"),
-                ),
-              ),
-            ))),*/
         const SizedBox(
           height: 20.0,
         ),

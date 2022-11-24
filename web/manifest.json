@@ -1,6 +1,6 @@
 {
-    "name": "tempo_application",
-    "short_name": "tempo_application",
+    "name": "Velocitype",
+    "short_name": "Velocitype",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

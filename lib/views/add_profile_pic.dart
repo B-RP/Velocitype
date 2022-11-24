@@ -42,9 +42,9 @@ class _AddProfilePicState extends State<AddProfilePic> {
                       height: 72.h,
                     ),
                     Text(
-                      'Your all set!',
-                      style:
-                          TextStyle(fontSize: 24, fontWeight: FontWeight.w700),
+                      'You\'re all set',
+                      style: TextStyle(
+                          fontSize: 6.sp, fontWeight: FontWeight.w700),
                     ),
                     SizedBox(
                       height: 22.h,
@@ -69,7 +69,7 @@ class _AddProfilePicState extends State<AddProfilePic> {
                                   shape: BoxShape.circle,
                                   image: DecorationImage(
                                     image: AssetImage(
-                                      'assets/images/profileimg.png',
+                                      'assets/images/dummy.jpeg',
                                     ),
                                     fit: BoxFit.fitHeight,
                                   )),
@@ -81,12 +81,12 @@ class _AddProfilePicState extends State<AddProfilePic> {
                     Text(
                       'Welcome ${_userController.loginUser.value.name}!',
                       style: TextStyle(
-                          fontSize: 10.sp, fontWeight: FontWeight.w700),
+                          fontSize: 6.sp, fontWeight: FontWeight.w700),
                     ),
                     Text(
-                      'Take a minute to add a profile picture.',
+                      'Take a minute to add a profile picture',
                       style: TextStyle(
-                          fontSize: 10.sp, fontWeight: FontWeight.w200),
+                          fontSize: 4.sp, fontWeight: FontWeight.w200),
                     ),
                     SizedBox(
                       height: 20.h,
@@ -104,16 +104,40 @@ class _AddProfilePicState extends State<AddProfilePic> {
                       child: Container(
                         alignment: Alignment.center,
                         height: 40.h,
-                        width: 180.w,
+                        width: MediaQuery.of(context).size.width * .35,
                         decoration: BoxDecoration(
-                            color: Color(0xff00B3BB),
+                            color: Color(0xff2F00F9),
                             borderRadius: BorderRadius.circular(50)),
                         child: Text(
                           photo == "" ? 'Add a photo' : 'Next',
                           style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.w700,
-                              fontSize: 10.sp),
+                              fontSize: 4.sp),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 20.h,
+                    ),
+                    InkWell(
+                      onTap: () {
+                        _userController.isGuest.value = false;
+                        Get.offAll(() => const MyApp());
+                      },
+                      child: Container(
+                        alignment: Alignment.center,
+                        height: 40.h,
+                        width: MediaQuery.of(context).size.width * .35,
+                        decoration: BoxDecoration(
+                            color: Color(0xff2F00F9),
+                            borderRadius: BorderRadius.circular(50)),
+                        child: Text(
+                          "Skip",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 4.sp),
                         ),
                       ),
                     )
@@ -158,6 +182,7 @@ class _AddProfilePicState extends State<AddProfilePic> {
               ListTile(
                 onTap: () {
                   getImage(ImageSource.camera);
+                  Get.back();
                 },
                 leading: const Icon(
                   Icons.camera_alt,
@@ -167,7 +192,9 @@ class _AddProfilePicState extends State<AddProfilePic> {
               ),
               ListTile(
                 onTap: () {
-                  getImage(ImageSource.gallery);
+                  getImage(ImageSource.camera);
+                  Get.back();
+                  //  getImage(ImageSource.gallery);
                 },
                 leading: const Icon(
                   Icons.collections,
@@ -201,7 +228,7 @@ class _AddProfilePicState extends State<AddProfilePic> {
       setState(() {});
 
       uploadingImage = true;
-      // Upload image to Firebase storage and get the online link and store that link to the cloud firestore
+      // Upload image to Firebase storage and get the online link and store that link to the Cloud Firestore
       Reference userStorageReference = FirebaseStorage.instance
           .ref()
           .child("users")
@@ -227,7 +254,7 @@ class _AddProfilePicState extends State<AddProfilePic> {
         setState(() {
           uploadingImage = false;
         });
-        showToast("Image Uploaded Successfully");
+        showToast("Image uploaded successfully");
       });
     }
   }

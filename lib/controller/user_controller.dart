@@ -8,8 +8,9 @@ class UserController extends GetxController {
   Rx<FUser> loginUser =
       FUser(name: "", uid: "", email: "", profileImage: "").obs;
   RxList<ResultRecord> records =
-      <ResultRecord>[].obs; // Contain all the list of results
-// use to set new user
+      <ResultRecord>[].obs; // Contains all the list of results
+
+// Set new user
   setUser(User user) {
     loginUser.value = FUser(
         name: user.displayName ?? "",

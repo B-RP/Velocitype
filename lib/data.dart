@@ -989,8 +989,6 @@ class Data {
     "employment"
   ];
 
-  //This function will fill a list of size 12 with random words from the list above
-  // UPDATED
   static List fillList() {
     var rng = Random();
 

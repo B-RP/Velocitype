@@ -1,6 +1,5 @@
 // To parse this JSON data, do
-//
-//     final resultRecord = resultRecordFromJson(jsonString);
+// final resultRecord = resultRecordFromJson(jsonString);
 
 import 'dart:convert';
 
@@ -15,6 +14,7 @@ class ResultRecord {
     required this.time,
   });
 
+// Results data
   int score;
   String time;
 
