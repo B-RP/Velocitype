@@ -20,7 +20,7 @@ import 'data.dart';
 import 'menu.dart';
 
 Future<void> main() async {
-  // These two lines initialize the Firebase database when app starts
+  // These two lines are used to initialize the Firebase database when app starts
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     // options: DefaultFirebaseOptions.currentPlatform,
@@ -36,11 +36,10 @@ Future<void> main() async {
     ),
   );
   runApp(const GetMaterialApp(
-      // App moves to splash screen
-      home: SplashScreen()));
+      home: SplashScreen())); // App moves to the splash screen
 }
 
-// HOME PAGE
+// This MyApp screen is actually home page when user login then this screen opens
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
@@ -50,12 +49,12 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   // This _wordController is an instance of Words Controller
-  // it keeps the record of words and current word index and number of right words
+  // it keep the record of words and current word index and number of right words
   final WordsController _wordsController = Get.put(WordsController());
 
   // When this screen opens the first function which will call is the initState function,'
-  // it will help get what is necessary to initialize elements of screen
-  // In this case, the current word index and score is being initialized to 0
+  // it will help to get the require things necessary to initialize elements of screen
+  // In our case we are setting the current word index to 0 means first and score is set to 0
   @override
   void initState() {
     // TODO: implement initState
@@ -77,7 +76,7 @@ class _MyAppState extends State<MyApp> {
   }
 }
 
-// Main application
+//Main application
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
   @override
@@ -215,7 +214,7 @@ class _WordBankState extends State<WordBank> {
 }
 
 class InteractionRow extends StatefulWidget {
-  InteractionRow({super.key});
+  const InteractionRow({super.key});
 
   @override
   State<InteractionRow> createState() => _InteractionRowState();
@@ -227,7 +226,7 @@ class _InteractionRowState extends State<InteractionRow> {
   final WordsController _wordsController = Get.put(WordsController());
 
   final UserController _userController = Get.put(
-      UserController()); // This is user controller it keeps the record of results of user and other details of user
+      UserController()); // This is user controller it keep the record of results of user and other details of user
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -238,6 +237,7 @@ class _InteractionRowState extends State<InteractionRow> {
         // USING VISIBILITY WIDGET
         // Which shows and hides some widget in particular
         // In this case, the input text field and other element of row when all answers are given
+
         Obx(() => Visibility(
               visible: _wordsController.index.value < 24,
               child:
@@ -305,12 +305,12 @@ class _InteractionRowState extends State<InteractionRow> {
                                                             Navigator.of(
                                                                     context)
                                                                 .pop();
-                                                            Get.back(); // This line closes the pop up
+                                                            Get.back(); // This line close the pop up
                                                           },
                                                           child: Icon(
                                                             Icons.close,
                                                             size: 35,
-                                                            color: Colors.black,
+                                                            color: Colors.grey,
                                                           ))
                                                     ],
                                                   ),
@@ -350,7 +350,7 @@ class _InteractionRowState extends State<InteractionRow> {
                                                               style: TextStyle(
                                                                   fontSize: 28,
                                                                   color: Color(
-                                                                      0xFF0001AC),
+                                                                      0xff2F00F9),
                                                                   fontWeight:
                                                                       FontWeight
                                                                           .bold),
@@ -399,7 +399,7 @@ class _InteractionRowState extends State<InteractionRow> {
                                                                     .start,
                                                             children: [
                                                               Text(
-                                                                // This line converts Date's format to 2022-12-28
+                                                                //THis line will use to convert String of time into Date and Tme Format and then converting it into 2022-12-28 this format
                                                                 DateFormat(
                                                                         'yyyy-MM-dd')
                                                                     .format(DateTime.parse(_userController
@@ -637,7 +637,7 @@ class _InteractionRowState extends State<InteractionRow> {
                                                 child: Text(
                                                   'Take test again'
                                                       .toUpperCase(),
-                                                  style: TextStyle(
+                                                  style: const TextStyle(
                                                       fontSize: 16,
                                                       fontWeight:
                                                           FontWeight.w600,
@@ -650,7 +650,7 @@ class _InteractionRowState extends State<InteractionRow> {
                                                       0;
                                                   _wordsController.score.value =
                                                       0;
-                                                  // Code to open screen MyApp
+                                                  //Code to open screen MyApp
                                                   Get.off(() => const MyApp());
                                                 },
                                               )
@@ -671,7 +671,7 @@ class _InteractionRowState extends State<InteractionRow> {
                                                       0;
                                                   _wordsController.score.value =
                                                       0;
-                                                  // Code to open screen MyApp
+                                                  //Code to open screen MyApp
                                                   Get.off(() => const MyApp());
                                                   showGeneralDialog(
                                                     context: context,
@@ -707,13 +707,13 @@ class _InteractionRowState extends State<InteractionRow> {
                                     );
                                   },
                                 );
-                                log("Show end Alert Dialog");
+                                log("show end Alert Dialog");
                               });
                             } else {
                               {
-                                // When record will inserted then toast will show on screen
+                                // when record will inserted then toast will show on screen
                                 // with message that result added successfully
-                                // Adding the new record to user controller
+                                //Adding the new record to user controller
                                 _userController.records.add(ResultRecord(
                                     score: _wordsController.score.value,
                                     time: DateTime.now().toString()));
@@ -758,14 +758,14 @@ class _InteractionRowState extends State<InteractionRow> {
                                                             _wordsController
                                                                 .score
                                                                 .value = 0;
-                                                            //VCode to open screen MyApp
+                                                            //Code to open screen MyApp
                                                             Get.off(() =>
                                                                 const MyApp());
                                                           },
                                                           child: const Icon(
                                                             Icons.close,
                                                             size: 35,
-                                                            color: Colors.black,
+                                                            color: Colors.grey,
                                                           ))
                                                     ],
                                                   ),
@@ -775,7 +775,7 @@ class _InteractionRowState extends State<InteractionRow> {
                                                           .symmetric(
                                                       horizontal: 50.0),
                                                   child: Card(
-                                                    // Card with circular border
+                                                    //Card with circular border
                                                     color: Colors.white
                                                         .withOpacity(0.75),
                                                     shape:
@@ -805,7 +805,7 @@ class _InteractionRowState extends State<InteractionRow> {
                                                               style: TextStyle(
                                                                   fontSize: 28,
                                                                   color: Color(
-                                                                      0xFF0001AC),
+                                                                      0xff2F00F9),
                                                                   fontWeight:
                                                                       FontWeight
                                                                           .bold),
@@ -854,7 +854,7 @@ class _InteractionRowState extends State<InteractionRow> {
                                                                     .start,
                                                             children: [
                                                               Text(
-                                                                // This line will use to convert String of time into Date and Time Format and then converting it into 2022-12-28 this format
+                                                                //THis line will use to convert String of time into Date and Tme Format and then converting it into 2022-12-28 this format
                                                                 DateFormat(
                                                                         'yyyy-MM-dd')
                                                                     .format(DateTime.parse(_userController
@@ -1127,7 +1127,7 @@ class _InteractionRowState extends State<InteractionRow> {
                                                       0;
                                                   _wordsController.score.value =
                                                       0;
-                                                  // Code to open screen MyApp
+                                                  //Code to open screen MyApp
                                                   Get.off(() => const MyApp());
                                                   showGeneralDialog(
                                                     context: context,
@@ -1163,12 +1163,12 @@ class _InteractionRowState extends State<InteractionRow> {
                                     );
                                   },
                                 );
-                                log("Show end Alert Dialog");
+                                log("show end Alert Dialog");
                               }
                             }
                           } catch (e) {
                             // If any exception occurs in try block then this catch block will execute and
-                            // In this case, exception will show in red toast
+                            //in our case exception will show in red toast
                             Fluttertoast.showToast(
                                 msg: e.toString(),
                                 toastLength: Toast.LENGTH_SHORT,
@@ -1234,7 +1234,6 @@ class _InteractionRowState extends State<InteractionRow> {
                     : const SizedBox(),
                 _userController.isGuest.value == false
                     ? IconButton(
-                        iconSize: 40,
                         icon: const Icon(
                           Icons.menu,
                           color: Colors.grey,
