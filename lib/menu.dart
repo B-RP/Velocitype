@@ -76,7 +76,7 @@ class _MenuState extends State<Menu> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              //Get image of user from firebase and show it into circle shade widget
+              // Get image of user from Firebase and show it into circle shade widget
               Row(
                 children: [
                   Spacer(),
@@ -133,10 +133,10 @@ class _MenuState extends State<Menu> {
                     fontSize: 20),
               )),
               Center(
-                  //signout or logout button
+                  // signout or logout button
                   child: TextButton(
                 onPressed: () {
-                  // This function execute when user press the button
+                  // This function executes when user presses the button
                   signOutGoogle();
                 },
                 child: Text('Logout',
@@ -147,7 +147,7 @@ class _MenuState extends State<Menu> {
               )),
               Text(
                 "Past results",
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
               ),
               SizedBox(
                 height: 30.0,

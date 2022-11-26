@@ -53,7 +53,7 @@ class _MyAppState extends State<MyApp> {
   // it keeps the record of words and current word index and number of right words
   final WordsController _wordsController = Get.put(WordsController());
 
-  // When this screen will open the first function which will call is the initState function,'
+  // When this screen opens the first function which will call is the initState function,'
   // it will help get what is necessary to initialize elements of screen
   // In this case, the current word index and score is being initialized to 0
   @override
@@ -632,27 +632,33 @@ class _InteractionRowState extends State<InteractionRow> {
                                         ),
                                       ),
                                       actions: <Widget>[
-                                        TextButton(
-                                          child: const Text(
-                                            'Take test again',
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w600,
-                                                color: Color(0xff2F00F9)),
-                                          ),
-                                          onPressed: () {
-                                            Navigator.of(context)
-                                                .pop(); // This line close the pop up
-                                            _wordsController.index.value = 0;
-                                            _wordsController.score.value = 0;
-                                            //Code to open screen MyApp
-                                            Get.off(() => const MyApp());
-                                          },
-                                        ),
+                                        _userController.isGuest.value == false
+                                            ? TextButton(
+                                                child: Text(
+                                                  'Take test again'
+                                                      .toUpperCase(),
+                                                  style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color: Color(0xff2F00F9)),
+                                                ),
+                                                onPressed: () {
+                                                  Navigator.of(context)
+                                                      .pop(); // This line close the pop up
+                                                  _wordsController.index.value =
+                                                      0;
+                                                  _wordsController.score.value =
+                                                      0;
+                                                  // Code to open screen MyApp
+                                                  Get.off(() => const MyApp());
+                                                },
+                                              )
+                                            : const SizedBox(),
                                         (_userController.isGuest.value == false)
                                             ? TextButton(
                                                 child: const Text(
-                                                  'Show past results',
+                                                  'SHOW PAST RESULTS',
                                                   style: TextStyle(
                                                       fontSize: 16,
                                                       fontWeight:
@@ -665,7 +671,7 @@ class _InteractionRowState extends State<InteractionRow> {
                                                       0;
                                                   _wordsController.score.value =
                                                       0;
-                                                  //Code to open screen MyApp
+                                                  // Code to open screen MyApp
                                                   Get.off(() => const MyApp());
                                                   showGeneralDialog(
                                                     context: context,
@@ -752,11 +758,11 @@ class _InteractionRowState extends State<InteractionRow> {
                                                             _wordsController
                                                                 .score
                                                                 .value = 0;
-                                                            //Code to open screen MyApp
+                                                            //VCode to open screen MyApp
                                                             Get.off(() =>
                                                                 const MyApp());
                                                           },
-                                                          child: Icon(
+                                                          child: const Icon(
                                                             Icons.close,
                                                             size: 35,
                                                             color: Colors.black,
@@ -769,7 +775,7 @@ class _InteractionRowState extends State<InteractionRow> {
                                                           .symmetric(
                                                       horizontal: 50.0),
                                                   child: Card(
-                                                    //Card with circular border
+                                                    // Card with circular border
                                                     color: Colors.white
                                                         .withOpacity(0.75),
                                                     shape:
@@ -1081,28 +1087,35 @@ class _InteractionRowState extends State<InteractionRow> {
                                         ),
                                       ),
                                       actions: <Widget>[
-                                        TextButton(
-                                          child: const Text(
-                                            'Take test again',
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w600,
-                                                color: Color(0xff2F00F9)),
-                                          ),
-                                          onPressed: () {
-                                            Navigator.of(context)
-                                                .pop(); // This line close the pop up
-                                            _wordsController.index.value = 0;
-                                            _wordsController.score.value = 0;
-                                            //Code to open screen MyApp
-                                            Get.off(() => const MyApp());
-                                          },
-                                        ),
+                                        _userController.isGuest.value == false
+                                            ? TextButton(
+                                                child: Text(
+                                                  'Take test again'
+                                                      .toUpperCase(),
+                                                  style: const TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color: Color(0xff2F00F9)),
+                                                ),
+                                                onPressed: () {
+                                                  Navigator.of(context)
+                                                      .pop(); // This line close the pop up
+                                                  _wordsController.index.value =
+                                                      0;
+                                                  _wordsController.score.value =
+                                                      0;
+                                                  //Code to open screen MyApp
+                                                  Get.off(() => const MyApp());
+                                                },
+                                              )
+                                            : const SizedBox(),
                                         (_userController.isGuest.value == false)
                                             ? TextButton(
-                                                child: const Text(
-                                                  'Show past results',
-                                                  style: TextStyle(
+                                                child: Text(
+                                                  'Show past results'
+                                                      .toUpperCase(),
+                                                  style: const TextStyle(
                                                       fontSize: 16,
                                                       fontWeight:
                                                           FontWeight.w600,
@@ -1114,7 +1127,7 @@ class _InteractionRowState extends State<InteractionRow> {
                                                       0;
                                                   _wordsController.score.value =
                                                       0;
-                                                  //Code to open screen MyApp
+                                                  // Code to open screen MyApp
                                                   Get.off(() => const MyApp());
                                                   showGeneralDialog(
                                                     context: context,
@@ -1168,14 +1181,21 @@ class _InteractionRowState extends State<InteractionRow> {
                         }
                       },
                       style: const TextStyle(color: Colors.white),
-                      decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          hintText: "Type to begin test"),
+                      decoration: InputDecoration(
+                          border: const OutlineInputBorder(),
+                          enabledBorder: const OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.white)),
+                          disabledBorder: const OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.white)),
+                          hintStyle: const TextStyle(color: Colors.grey),
+                          hintText: _wordsController.index.value == 0
+                              ? "Type to begin test"
+                              : "Type next word"),
                       controller: textFieldController),
                 ),
                 IconButton(
                     iconSize: 40,
-                    icon: const Icon(Icons.refresh),
+                    icon: const Icon(Icons.refresh, color: Colors.grey),
                     onPressed: () {
                       // reseting state and call the Home page again
                       _wordsController.index.value = 0;
@@ -1190,9 +1210,35 @@ class _InteractionRowState extends State<InteractionRow> {
                       focusColor: Colors.white,
                       highlightColor: Colors.white,
                     )),
+                _userController.isGuest.value == true
+                    ? IconButton(
+                        iconSize: 40,
+                        icon: const Icon(
+                          Icons.login,
+                          color: Colors.grey,
+                        ),
+                        onPressed: () {
+                          // reseting state and call the Home page again
+                          _wordsController.index.value = 0;
+                          _wordsController.score.value = 0;
+                          Get.offAll(() => const LoginScreen());
+                        },
+                        style: IconButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          backgroundColor: Colors.transparent,
+                          disabledBackgroundColor: Colors.white,
+                          hoverColor: Colors.white,
+                          focusColor: Colors.white,
+                          highlightColor: Colors.white,
+                        ))
+                    : const SizedBox(),
                 _userController.isGuest.value == false
                     ? IconButton(
-                        icon: const Icon(Icons.menu),
+                        iconSize: 40,
+                        icon: const Icon(
+                          Icons.menu,
+                          color: Colors.grey,
+                        ),
                         onPressed: () {
                           showGeneralDialog(
                             context: context,

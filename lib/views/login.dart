@@ -185,7 +185,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 setState(() {
                                   loading = true;
                                 });
-                                //If email or password text field is empty then show message to fill that field
+                                // If email or password text field is empty then show message to fill that field
                                 if (email.text == "" && password.text == "") {
                                   setState(() {
                                     loading = false;
@@ -194,7 +194,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       snackBar(
                                           'Alert! Please enter all details'));
                                 }
-                                //Check Email is well formatted or not
+                                // Check if email is formatted correctly or not
                                 else if (email.text.isEmpty ||
                                     !(email.text.contains("@")) ||
                                     !(email.text.contains("."))) {
@@ -292,7 +292,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   Get.to(() => const MyApp());
                                 },
                                 child: Text(
-                                  'Guest Account',
+                                  'Guest account',
                                   style: TextStyle(
                                       color: Color(0xff2F00F9), fontSize: 4.sp),
                                 )),

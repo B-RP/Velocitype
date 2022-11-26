@@ -107,7 +107,7 @@ class _AddProfilePicState extends State<AddProfilePic> {
                         width: MediaQuery.of(context).size.width * .35,
                         decoration: BoxDecoration(
                             color: Color(0xff2F00F9),
-                            borderRadius: BorderRadius.circular(50)),
+                            borderRadius: BorderRadius.circular(10)),
                         child: Text(
                           photo == "" ? 'Add a photo' : 'Next',
                           style: TextStyle(
@@ -131,7 +131,7 @@ class _AddProfilePicState extends State<AddProfilePic> {
                         width: MediaQuery.of(context).size.width * .35,
                         decoration: BoxDecoration(
                             color: Color(0xff2F00F9),
-                            borderRadius: BorderRadius.circular(50)),
+                            borderRadius: BorderRadius.circular(10)),
                         child: Text(
                           "Skip",
                           style: TextStyle(

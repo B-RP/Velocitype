@@ -77,12 +77,12 @@ class _SplashScreenState extends State<SplashScreen> {
       } on FirebaseAuthException catch (e) {
         snackBar(e.message.toString());
         // If user is not logged in then navigate user to login screen
-        Future.delayed(const Duration(milliseconds: 1500), () {
+        Future.delayed(const Duration(seconds: 3), () {
           Get.offAll(() => const LoginScreen());
         });
       }
     } else {
-      Future.delayed(const Duration(milliseconds: 2000), () {
+      Future.delayed(const Duration(seconds: 3), () {
         //  Get.offAll(() => const MyApp());
         Get.offAll(() => const LoginScreen());
       });

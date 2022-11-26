@@ -68,7 +68,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         child: Scaffold(
           backgroundColor: Colors.white,
           resizeToAvoidBottomInset:
-              true, // When keyboard will open then the UI of system will  not be disturbed
+              true, // When keyboard opens then the UI of system will  not be disturbed
           body: ScreenUtilInit(
             builder: (context, child) => SingleChildScrollView(
               child: Stack(
@@ -96,7 +96,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               fontWeight: FontWeight.w600,
                               color: Colors.black),
                         ),
-                        SizedBox(height: 0.h),
+                        SizedBox(height: 10.h),
                         Text(
                           'Create new account',
                           style: TextStyle(
@@ -138,7 +138,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           child: TextField(
                             style: TextStyle(
                                 color: Colors.black54,
-                                fontSize: 4.sp,
+                                fontSize: 5.sp,
                                 fontWeight: FontWeight.normal),
                             controller: _password,
                             obscureText: passObscure,
@@ -171,7 +171,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 border: InputBorder.none,
                                 hintText: "Password",
                                 hintStyle: TextStyle(
-                                    fontSize: 4.sp,
+                                    fontSize: 5.sp,
                                     color: const Color(0xff737373),
                                     fontWeight: FontWeight.normal)),
                           ),
@@ -189,7 +189,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           child: TextField(
                             style: TextStyle(
                                 color: Colors.black54,
-                                fontSize: 4.sp,
+                                fontSize: 5.sp,
                                 fontWeight: FontWeight.normal),
                             controller: _confirmPassword,
                             obscureText: confirmPassObscure,
@@ -220,7 +220,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 border: InputBorder.none,
                                 hintText: 'Confirm password',
                                 hintStyle: TextStyle(
-                                    fontSize: 4.sp,
+                                    fontSize: 5.sp,
                                     color: const Color(0xff737373),
                                     fontWeight: FontWeight.normal)),
                           ),
@@ -343,9 +343,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   color: Color(0xff2F00F9),
                                   borderRadius: BorderRadius.circular(10.r)),
                               child: Text(
-                                'Create Account',
+                                'Create account',
                                 style: TextStyle(
-                                    color: Colors.white, fontSize: 4.sp),
+                                    color: Colors.white, fontSize: 5.sp),
                               ),
                             ),
                           ),
@@ -405,7 +405,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       child: TextField(
         style: TextStyle(
             color: Colors.black54,
-            fontSize: 4.sp,
+            fontSize: 5.sp,
             fontWeight: FontWeight.normal),
         controller: controller,
         decoration: InputDecoration(
@@ -414,7 +414,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             border: InputBorder.none,
             hintText: hint,
             hintStyle: TextStyle(
-                fontSize: 4.sp,
+                fontSize: 5.sp,
                 color: const Color(0xff737373),
                 fontWeight: FontWeight.normal)),
       ),
