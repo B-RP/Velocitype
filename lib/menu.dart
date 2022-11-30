@@ -179,7 +179,7 @@ class _MenuState extends State<Menu> {
                                       padding: EdgeInsets.only(bottom: 10.0),
                                       child: Center(
                                           child: Text(
-                                        "70 WPM",
+                                        "",
                                         style: TextStyle(
                                             fontSize: 28,
                                             color: Color(0xff2F00F9),
@@ -233,7 +233,7 @@ class _MenuState extends State<Menu> {
                                             _userController.records
                                                 .elementAt(index)
                                                 .time))*/
-                                          "40 sec",
+                                          "1 min",
                                         ),
                                       ],
                                     ),
@@ -245,8 +245,8 @@ class _MenuState extends State<Menu> {
                                         children: [
                                           Row(
                                             children: [
-                                              const Text(
-                                                "Keystrokes: ",
+                                              Text(
+                                                "Keystrokes: (${Data.totalKeys - Data.totalIncKeys} | ${Data.totalIncKeys}) ${Data.totalKeys}",
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                 ),
@@ -256,16 +256,15 @@ class _MenuState extends State<Menu> {
                                               ),
                                               Text(
                                                 // index hold the values of current element
-                                                _data
-                                                    .calcKeyAccuracy()
+                                                Data.calcKeyAccuracy()
                                                     .toString(),
                                               ),
                                             ],
                                           ),
                                           Row(
                                             children: [
-                                              const Text(
-                                                "Word Acc: ",
+                                              Text(
+                                                "Word Accuracy: ${Data.wordAccuracy.toStringAsFixed(2)}%",
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                 ),
@@ -275,8 +274,7 @@ class _MenuState extends State<Menu> {
                                               ),
                                               Text(
                                                   // index hold the values of current element
-                                                  _data
-                                                      .calcWordAccuracy()
+                                                  Data.calcWordAccuracy()
                                                       .toString()),
                                             ],
                                           ),
@@ -296,7 +294,7 @@ class _MenuState extends State<Menu> {
                                             mainAxisAlignment:
                                                 MainAxisAlignment.start,
                                             children: [
-                                              const Text(
+                                              Text(
                                                 "Accuracy: ",
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.bold,
@@ -306,7 +304,8 @@ class _MenuState extends State<Menu> {
                                                 width: 40.0,
                                               ),
                                               Text(
-                                                "${(_userController.records.elementAt(index).score * 100) ~/ 24}%",
+                                                Data.wordAccuracy.toString(),
+                                                //"${(_userController.records.elementAt(index).score * 100) ~/ 24}%",
                                                 style: TextStyle(
                                                     color: ((_userController
                                                                         .records
@@ -342,9 +341,7 @@ class _MenuState extends State<Menu> {
                                                 ),
                                                 Text(
                                                   //"${(_userController.records.elementAt(index).score * 100) ~/ 40}%",
-                                                  _data
-                                                      .calcWPM(20.0)
-                                                      .toString(),
+                                                  Data.totalWords.toString(),
                                                   style: TextStyle(
                                                       color: ((_userController
                                                                           .records
@@ -384,13 +381,15 @@ class _MenuState extends State<Menu> {
                                               const SizedBox(
                                                 width: 40.0,
                                               ),
-                                              Text(
-                                                // index hold the values of current element
-                                                _userController.records
-                                                    .elementAt(index)
-                                                    .score
-                                                    .toString(),
-                                              ),
+                                              Text((Data.totalWords -
+                                                          Data.totalIncWords)
+                                                      .toString()
+                                                  // index hold the values of current element
+                                                  //_userController.records
+                                                  //    .elementAt(index)
+                                                  //    .score
+                                                  //    .toString(),
+                                                  ),
                                             ],
                                           ),
                                         ),
@@ -408,10 +407,10 @@ class _MenuState extends State<Menu> {
                                               const SizedBox(
                                                 width: 40.0,
                                               ),
-                                              Text(
-                                                // index hold the values of current element
-                                                '${24 - _userController.records.elementAt(index).score}',
-                                              ),
+                                              Text(Data.totalIncWords.toString()
+                                                  // index hold the values of current element
+                                                  //'${24 - _userController.records.elementAt(index).score}',
+                                                  ),
                                             ],
                                           ),
                                         ),

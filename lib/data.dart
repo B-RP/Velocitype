@@ -1,38 +1,65 @@
-import 'package:english_words/english_words.dart';
 import 'dart:math';
 
 import 'package:tempo_application/main.dart';
 
 class Data {
-  static int testInt = 0;
-  int totalWords = 0;
-  int totalIncWords = 0;
-  int totalKeys = 0;
-  int totalIncKeys = 0;
-  Data() {
-    totalWords = 0;
-    totalIncWords = 0;
-    totalKeys = 0;
-    totalIncKeys = 0;
-    testInt = 0;
-  }
-  double calcWordAccuracy() {
+  static int currentIndex = 0;
+
+  static int totalWords = 0;
+  static int totalIncWords = 0;
+
+  static int totalKeys = 0;
+  static int totalIncKeys = 0;
+
+  static double wordAccuracy = 0;
+
+  static String inputTyped = "";
+  static String targetWord = "";
+
+  static bool timerActive = false;
+
+  static double calcWordAccuracy() {
     var correctWords = totalWords - totalIncWords;
-    var wordAccuracy = correctWords / totalWords;
+    var wordAcc = correctWords / totalWords;
 
-    return wordAccuracy * 100;
+    wordAccuracy = wordAcc * 100;
+
+    return wordAcc * 100;
   }
 
-  double calcKeyAccuracy() {
+  static double calcKeyAccuracy() {
     var correctKeys = totalKeys - totalIncKeys;
     var keyAccuracy = correctKeys / totalKeys;
 
     return keyAccuracy * 100;
   }
 
-  double calcWPM(double timer) {
+  static double calcWPM(double timer) {
     var wpm = totalWords / timer;
     return wpm;
+  }
+
+  static bool checkWord(String word, String target) {
+    for (int i = 0; i < word.length; i++) {
+      if (word[i] != target[i]) {
+        totalKeys++;
+        totalIncKeys++;
+        return false;
+      }
+    }
+    totalKeys++;
+    return true;
+  }
+
+  static bool checkFullWord(String word, String target) {
+    if (word == target) {
+      totalWords++;
+      return true;
+    } else {
+      totalWords++;
+      totalIncWords++;
+      return false;
+    }
   }
 
   static var wordList = [
@@ -996,7 +1023,19 @@ class Data {
     for (int i = 0; i <= 23; i++) {
       wordList2[i] = "${wordList[rng.nextInt(wordList.length)]} ";
     }
-    print(wordList2);
+    //print(wordList2);
     return wordList2;
+  }
+
+  static void newTest() {
+    currentIndex = 0;
+    totalWords = 0;
+    totalIncWords = 0;
+    totalKeys = 0;
+    totalIncKeys = 0;
+    wordAccuracy = 0;
+    inputTyped = "";
+    targetWord = "";
+    timerActive = false;
   }
 }
