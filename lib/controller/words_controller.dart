@@ -5,7 +5,7 @@ class WordsController extends GetxController {
   RxList wordLine1 = Data.fillList().obs;
   RxInt index = 0.obs;
   RxInt score = 0.obs;
-
+  RxBool testBegin = false.obs;
   bool checkWord(String typedWord) {
     bool answer = false;
     if (typedWord != " ") {

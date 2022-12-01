@@ -87,6 +87,7 @@ class _MenuState extends State<Menu> {
                     child: Icon(
                       Icons.close,
                       size: 40,
+                      color: Colors.grey,
                     ),
                   )
                 ],
@@ -175,11 +176,11 @@ class _MenuState extends State<Menu> {
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    const Padding(
+                                    Padding(
                                       padding: EdgeInsets.only(bottom: 10.0),
                                       child: Center(
                                           child: Text(
-                                        "",
+                                        "${_userController.records.elementAt(index).wpm} WPM",
                                         style: TextStyle(
                                             fontSize: 28,
                                             color: Color(0xff2F00F9),
@@ -233,7 +234,7 @@ class _MenuState extends State<Menu> {
                                             _userController.records
                                                 .elementAt(index)
                                                 .time))*/
-                                          "1 min",
+                                          "60 sec",
                                         ),
                                       ],
                                     ),
@@ -246,7 +247,7 @@ class _MenuState extends State<Menu> {
                                           Row(
                                             children: [
                                               Text(
-                                                "Keystrokes: (${Data.totalKeys - Data.totalIncKeys} | ${Data.totalIncKeys}) ${Data.totalKeys}",
+                                                "Keystrokes: ",
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                 ),
@@ -256,15 +257,14 @@ class _MenuState extends State<Menu> {
                                               ),
                                               Text(
                                                 // index hold the values of current element
-                                                Data.calcKeyAccuracy()
-                                                    .toString(),
+                                                "${_userController.records.elementAt(index).keyStrokes}%",
                                               ),
                                             ],
                                           ),
                                           Row(
                                             children: [
                                               Text(
-                                                "Word Accuracy: ${Data.wordAccuracy.toStringAsFixed(2)}%",
+                                                "Word Accuracy: ",
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                 ),
@@ -273,9 +273,9 @@ class _MenuState extends State<Menu> {
                                                 width: 10.0,
                                               ),
                                               Text(
-                                                  // index hold the values of current element
-                                                  Data.calcWordAccuracy()
-                                                      .toString()),
+                                                // index hold the values of current element
+                                                '${_userController.records.elementAt(index).wordAccuracy}%',
+                                              ),
                                             ],
                                           ),
                                         ],
@@ -304,16 +304,15 @@ class _MenuState extends State<Menu> {
                                                 width: 40.0,
                                               ),
                                               Text(
-                                                Data.wordAccuracy.toString(),
+                                                '${_userController.records.elementAt(index).accuracy}%',
                                                 //"${(_userController.records.elementAt(index).score * 100) ~/ 24}%",
                                                 style: TextStyle(
-                                                    color: ((_userController
-                                                                        .records
-                                                                        .elementAt(
-                                                                            index)
-                                                                        .score *
-                                                                    100) ~/
-                                                                24) <
+                                                    color: (int.parse(
+                                                                _userController
+                                                                    .records
+                                                                    .elementAt(
+                                                                        index)
+                                                                    .accuracy)) <
                                                             50
                                                         ? Colors.red
                                                         : Colors.green,
@@ -341,21 +340,20 @@ class _MenuState extends State<Menu> {
                                                 ),
                                                 Text(
                                                   //"${(_userController.records.elementAt(index).score * 100) ~/ 40}%",
-                                                  Data.totalWords.toString(),
-                                                  style: TextStyle(
-                                                      color: ((_userController
-                                                                          .records
-                                                                          .elementAt(
-                                                                              index)
-                                                                          .score *
-                                                                      100) ~/
-                                                                  24) <
+                                                  '${_userController.records.elementAt(index).wpm}',
+                                                  /*style: TextStyle(
+                                                      color: (int.parse(
+                                                                  _userController
+                                                                      .records
+                                                                      .elementAt(
+                                                                          index)
+                                                                      .score)) <
                                                               50
                                                           ? Colors.red
                                                           : Colors.green,
                                                       fontSize: 18,
                                                       fontWeight:
-                                                          FontWeight.bold),
+                                                          FontWeight.bold),*/
                                                 ),
                                               ],
                                             ),
@@ -381,9 +379,9 @@ class _MenuState extends State<Menu> {
                                               const SizedBox(
                                                 width: 40.0,
                                               ),
-                                              Text((Data.totalWords -
-                                                          Data.totalIncWords)
-                                                      .toString()
+                                              Text(_userController.records
+                                                      .elementAt(index)
+                                                      .correctWords
                                                   // index hold the values of current element
                                                   //_userController.records
                                                   //    .elementAt(index)
@@ -407,7 +405,9 @@ class _MenuState extends State<Menu> {
                                               const SizedBox(
                                                 width: 40.0,
                                               ),
-                                              Text(Data.totalIncWords.toString()
+                                              Text(_userController.records
+                                                      .elementAt(index)
+                                                      .wrongWords
                                                   // index hold the values of current element
                                                   //'${24 - _userController.records.elementAt(index).score}',
                                                   ),

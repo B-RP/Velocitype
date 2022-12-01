@@ -88,6 +88,7 @@ class _MainPageState extends State<MainPage> {
   final GlobalKey<_WordBankState> _wordKey = GlobalKey();
   final GlobalKey<_CountdownTimerState> _timerKey = GlobalKey();
   final GlobalKey<_InteractionRowState> _InterRowKey = GlobalKey();
+  final WordsController _wordsController = Get.put(WordsController());
 
   @override
   Widget build(BuildContext context) {
@@ -112,11 +113,11 @@ class _MainPageState extends State<MainPage> {
                         padding: const EdgeInsets.fromLTRB(0, 20, 0, 10),
                         child: CountdownTimer(
                           key: _timerKey,
-
                           //TEST FINISHED
                           timerFinished: () {
                             //Data.calcWordAccuracy();
                             Data.timerActive = false;
+                            _wordsController.testBegin.value = false;
                             _InterRowKey.currentState?.showMenu();
                             _wordKey.currentState?.refresh();
                             _timerKey.currentState?.resetTimer();
@@ -136,6 +137,7 @@ class _MainPageState extends State<MainPage> {
                               refreshTest: () {
                                 Data.newTest();
                                 Data.timerActive = false;
+                                _wordsController.index.value;
                                 _wordKey.currentState?.refresh();
                                 _timerKey.currentState?.resetTimer();
                               },
@@ -176,6 +178,7 @@ class CountdownTimer extends StatefulWidget {
 class _CountdownTimerState extends State<CountdownTimer> {
   Timer? countdownTimer;
   Duration testDuration = const Duration(minutes: 1);
+  final WordsController _wordController = Get.put(WordsController());
 
   @override
   void initState() {
@@ -183,11 +186,13 @@ class _CountdownTimerState extends State<CountdownTimer> {
   }
 
   void startTimer() {
+    _wordController.testBegin.value = true;
     countdownTimer =
         Timer.periodic(const Duration(seconds: 1), (_) => setCountDown());
   }
 
   void stopTimer() {
+    _wordController.testBegin.value = false;
     setState(() => countdownTimer!.cancel());
   }
 
@@ -283,7 +288,7 @@ class _WordState extends State<Word> {
 
   String s = "";
 
-  TextStyle wordStyle = TextStyle(
+  TextStyle wordStyle = const TextStyle(
     fontSize: 25,
     color: Colors.white,
   );
@@ -387,8 +392,8 @@ class _WordBankState extends State<WordBank> {
   Widget build(BuildContext context) {
     Data.targetWord = wordLine1[0];
     return (Column(children: [
-      Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+      Wrap(
+        // mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Word(s: wordLine1[0], key: _wordKeys[0]),
           Word(s: wordLine1[1], key: _wordKeys[1]),
@@ -404,8 +409,8 @@ class _WordBankState extends State<WordBank> {
           Word(s: wordLine1[11], key: _wordKeys[11])
         ],
       ),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+      Wrap(
+        // mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Word(s: wordLine2[0], key: _wordKeys2[0]),
           Word(s: wordLine2[1], key: _wordKeys2[1]),
@@ -463,15 +468,32 @@ class _InteractionRowState extends State<InteractionRow> {
             .doc(_userController.loginUser.value.email)
             .collection("results")
             .add({
-          "score": _wordsController.score.value,
+          "score": Data.totalWords.toString(),
           "time": DateTime.now().toString(),
+          "keyStrokes": Data.calcKeyAccuracy().toString(),
+          "wordAccuracy": Data.calcWordAccuracy().toString(),
+          "accuracy": (((Data.totalWords - Data.totalIncWords) * 100) ~/
+                  Data.totalWords)
+              .toString(),
+          "wpm": Data.totalWords.toString(),
+          "correctWords": (Data.totalWords - Data.totalIncWords).toString(),
+          "wrongWords": Data.totalIncWords.toString(),
         }).whenComplete(() {
           // When record will inserted then toast will show on screen,
           // with message that result added successfully
           // Adding the new record to user controller
           _userController.records.add(ResultRecord(
-              score: _wordsController.score.value,
-              time: DateTime.now().toString()));
+            score: Data.totalWords.toString(),
+            time: DateTime.now().toString(),
+            keyStrokes: Data.calcKeyAccuracy().toString(),
+            wordAccuracy: Data.calcWordAccuracy().toString(),
+            accuracy: (((Data.totalWords - Data.totalIncWords) * 100) ~/
+                    Data.totalWords)
+                .toString(),
+            wpm: Data.totalWords.toString(),
+            correctWords: (Data.totalWords - Data.totalIncWords).toString(),
+            wrongWords: Data.totalIncWords.toString(),
+          ));
           log("Score Card");
           showDialog<void>(
             context: context,
@@ -579,7 +601,7 @@ class _InteractionRowState extends State<InteractionRow> {
                                         _userController.records
                                                   .elementAt(index)
                                                   .time))*/
-                                          "1 min",
+                                          "60 sec",
                                         ),
                                       ],
                                     ),
@@ -648,17 +670,17 @@ class _InteractionRowState extends State<InteractionRow> {
                                                 width: 40.0,
                                               ),
                                               Text(
-                                                "${(_userController.records.last.score * 100) ~/ 24}%",
+                                                "${((Data.totalWords - Data.totalIncWords) * 100) ~/ Data.totalWords}%",
                                                 style: TextStyle(
-                                                    color: ((_userController
-                                                                        .records
-                                                                        .last
-                                                                        .score *
+                                                    color: ((((Data.totalWords -
+                                                                        Data
+                                                                            .totalIncWords) *
                                                                     100) ~/
-                                                                24) <
+                                                                Data
+                                                                    .totalWords) <
                                                             50
                                                         ? Colors.red
-                                                        : Colors.green,
+                                                        : Colors.green),
                                                     fontSize: 18,
                                                     fontWeight:
                                                         FontWeight.bold),
@@ -681,17 +703,16 @@ class _InteractionRowState extends State<InteractionRow> {
                                                 ),
                                                 Text(
                                                   //"${(_userController.records.last.score * 100) ~/ 40}%",
-                                                  Data.calcWPM(20.0).toString(),
+                                                  Data.totalWords.toString(),
                                                   style: TextStyle(
-                                                      color: ((_userController
-                                                                          .records
-                                                                          .last
-                                                                          .score *
-                                                                      100) ~/
-                                                                  24) <
+                                                      color: ((int.parse(
+                                                                  _userController
+                                                                      .records
+                                                                      .last
+                                                                      .score)) <
                                                               50
                                                           ? Colors.red
-                                                          : Colors.green,
+                                                          : Colors.green),
                                                       fontSize: 18,
                                                       fontWeight:
                                                           FontWeight.bold),
@@ -722,8 +743,8 @@ class _InteractionRowState extends State<InteractionRow> {
                                               ),
                                               Text(
                                                 //index hold the values of current element
-                                                _userController
-                                                    .records.last.score
+                                                (Data.totalWords -
+                                                        Data.totalIncWords)
                                                     .toString(),
                                               ),
                                             ],
@@ -745,7 +766,7 @@ class _InteractionRowState extends State<InteractionRow> {
                                               ),
                                               Text(
                                                 //index hold the values of current element
-                                                '${24 - _userController.records.last.score}',
+                                                '${Data.totalIncWords}',
                                               ),
                                             ],
                                           ),
@@ -833,8 +854,17 @@ class _InteractionRowState extends State<InteractionRow> {
           // with message that result added successfully
           //Adding the new record to user controller
           _userController.records.add(ResultRecord(
-              score: _wordsController.score.value,
-              time: DateTime.now().toString()));
+            score: Data.totalWords.toString(),
+            time: DateTime.now().toString(),
+            keyStrokes: Data.calcKeyAccuracy().toString(),
+            wordAccuracy: Data.calcWordAccuracy().toString(),
+            accuracy: (((Data.totalWords - Data.totalIncWords) * 100) ~/
+                    Data.totalWords)
+                .toString(),
+            wpm: Data.totalWords.toString(),
+            correctWords: (Data.totalWords - Data.totalIncWords).toString(),
+            wrongWords: Data.totalIncWords.toString(),
+          ));
           log("Score Card");
           showDialog<void>(
             context: context,
@@ -888,11 +918,11 @@ class _InteractionRowState extends State<InteractionRow> {
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
-                                    const Padding(
+                                    Padding(
                                       padding: EdgeInsets.only(bottom: 10.0),
                                       child: Center(
                                           child: Text(
-                                        "70 WPM",
+                                        "${_userController.records.last.wpm} WPM",
                                         style: TextStyle(
                                             fontSize: 28,
                                             color: Color(0xff2F00F9),
@@ -946,7 +976,7 @@ class _InteractionRowState extends State<InteractionRow> {
                                         _userController.records
                                                   .elementAt(index)
                                                   .time))*/
-                                          "40 sec",
+                                          "60 sec",
                                         ),
                                       ],
                                     ),
@@ -971,8 +1001,8 @@ class _InteractionRowState extends State<InteractionRow> {
                                               ),
                                               Text(
                                                 //index hold the values of current element
-                                                Data.calcKeyAccuracy()
-                                                    .toString(),
+                                                _userController
+                                                    .records.last.keyStrokes,
                                               ),
                                             ],
                                           ),
@@ -989,8 +1019,8 @@ class _InteractionRowState extends State<InteractionRow> {
                                               ),
                                               Text(
                                                   //index hold the values of current element
-                                                  Data.calcWordAccuracy()
-                                                      .toString()),
+                                                  _userController.records.last
+                                                      .wordAccuracy),
                                             ],
                                           ),
                                         ],
@@ -1015,17 +1045,16 @@ class _InteractionRowState extends State<InteractionRow> {
                                                 width: 40.0,
                                               ),
                                               Text(
-                                                "${(_userController.records.last.score * 100) ~/ 24}%",
+                                                "${_userController.records.last.accuracy}%",
                                                 style: TextStyle(
-                                                    color: ((_userController
-                                                                        .records
-                                                                        .last
-                                                                        .score *
-                                                                    100) ~/
-                                                                24) <
+                                                    color: ((int.parse(
+                                                                _userController
+                                                                    .records
+                                                                    .last
+                                                                    .accuracy)) <
                                                             50
                                                         ? Colors.red
-                                                        : Colors.green,
+                                                        : Colors.green),
                                                     fontSize: 18,
                                                     fontWeight:
                                                         FontWeight.bold),
@@ -1048,17 +1077,9 @@ class _InteractionRowState extends State<InteractionRow> {
                                                 ),
                                                 Text(
                                                   //"${(_userController.records.last.score * 100) ~/ 40}%",
-                                                  Data.calcWPM(20.0).toString(),
+                                                  _userController
+                                                      .records.last.wpm,
                                                   style: TextStyle(
-                                                      color: ((_userController
-                                                                          .records
-                                                                          .last
-                                                                          .score *
-                                                                      100) ~/
-                                                                  24) <
-                                                              50
-                                                          ? Colors.red
-                                                          : Colors.green,
                                                       fontSize: 18,
                                                       fontWeight:
                                                           FontWeight.bold),
@@ -1090,7 +1111,7 @@ class _InteractionRowState extends State<InteractionRow> {
                                               Text(
                                                 //index hold the values of current element
                                                 _userController
-                                                    .records.last.score
+                                                    .records.last.correctWords
                                                     .toString(),
                                               ),
                                             ],
@@ -1112,7 +1133,8 @@ class _InteractionRowState extends State<InteractionRow> {
                                               ),
                                               Text(
                                                 //index hold the values of current element
-                                                '${24 - _userController.records.last.score}',
+                                                _userController
+                                                    .records.last.wrongWords,
                                               ),
                                             ],
                                           ),
@@ -1219,10 +1241,12 @@ class _InteractionRowState extends State<InteractionRow> {
         // Which shows and hides some widget in particular
         // In this case, the input text field and other element of row when all answers are given
 
-        Obx(() => Visibility(
-              visible: _wordsController.index.value < 24,
-              child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+        Obx(() => SizedBox(
+              width: MediaQuery.of(context).size.width,
+              child: Wrap(
+                  // mainAxisAlignment: MainAxisAlignment.center,
+                  alignment: WrapAlignment.center,
+                  runAlignment: WrapAlignment.center,
                   children: <Widget>[
                     SizedBox(
                       width: MediaQuery.of(context).size.width * 0.35,
@@ -1237,6 +1261,7 @@ class _InteractionRowState extends State<InteractionRow> {
                                 textFieldController.clear();
                                 widget.checkIndex();
                                 Data.currentIndex++;
+                                _wordsController.index.value++;
                               }
 
                               //if anything other than space is inputed, check spelling so far
@@ -1261,9 +1286,10 @@ class _InteractionRowState extends State<InteractionRow> {
                               disabledBorder: const OutlineInputBorder(
                                   borderSide: BorderSide(color: Colors.white)),
                               hintStyle: const TextStyle(color: Colors.grey),
-                              hintText: _wordsController.index.value == 0
-                                  ? "Type to begin test"
-                                  : "Type next word"),
+                              hintText:
+                                  _wordsController.testBegin.value == false
+                                      ? "Type to begin test"
+                                      : "Type next word"),
                           controller: textFieldController),
                     ),
                     IconButton(

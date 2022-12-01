@@ -100,6 +100,12 @@ class _SplashScreenState extends State<SplashScreen> {
       _userController.records.add(ResultRecord(
         score: element.get("score"),
         time: element.get("time"),
+        keyStrokes: element.get("keyStrokes"),
+        wordAccuracy: element.get("wordAccuracy"),
+        accuracy: element.get("accuracy"),
+        wpm: element.get("wpm"),
+        correctWords: element.get("correctWords"),
+        wrongWords: element.get("wrongWords"),
       ));
     }
   }

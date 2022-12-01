@@ -31,12 +31,12 @@ class Data {
     var correctKeys = totalKeys - totalIncKeys;
     var keyAccuracy = correctKeys / totalKeys;
 
-    return keyAccuracy * 100;
+    return double.parse((keyAccuracy * 100).toStringAsFixed(2));
   }
 
   static double calcWPM(double timer) {
     var wpm = totalWords / timer;
-    return wpm;
+    return double.parse(wpm.toStringAsFixed(2));
   }
 
   static bool checkWord(String word, String target) {
@@ -58,6 +58,7 @@ class Data {
     } else {
       totalWords++;
       totalIncWords++;
+      print("totalWords $totalWords \n totalIncWords $totalIncWords ");
       return false;
     }
   }
