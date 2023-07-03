@@ -10,6 +10,7 @@ class FUser {
     required this.uid,
     required this.email,
     required this.profileImage,
+    required this.backgroundImage,
   });
 
 // User data
@@ -17,18 +18,20 @@ class FUser {
   String uid;
   String email;
   String profileImage;
+  String backgroundImage;
 
   factory FUser.fromJson(Map<String, dynamic> json) => FUser(
-        name: json["name"] ?? "",
-        uid: json["uid"] ?? "",
-        email: json["email"] ?? "",
-        profileImage: json["photo"] ?? "",
-      );
+      name: json["name"] ?? "",
+      uid: json["uid"] ?? "",
+      email: json["email"] ?? "",
+      profileImage: json["photo"] ?? "",
+      backgroundImage: json['backgroundImage'] ?? "");
 
   Map<String, dynamic> toJson() => {
         "name": name,
         "email": email,
         "photo": profileImage,
         "uid": uid,
+        "backgroundImage": backgroundImage
       };
 }

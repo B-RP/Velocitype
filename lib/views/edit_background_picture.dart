@@ -11,19 +11,18 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:tempo_application/controller/user_controller.dart';
 import 'package:tempo_application/main.dart';
-import 'package:tempo_application/views/add_background_image.dart';
 
 import '../model/user_model.dart';
 import '../widget/toast.dart';
 
-class AddProfilePic extends StatefulWidget {
-  const AddProfilePic({Key? key}) : super(key: key);
+class EditBackgroundImage extends StatefulWidget {
+  const EditBackgroundImage({Key? key}) : super(key: key);
 
   @override
-  _AddProfilePicState createState() => _AddProfilePicState();
+  _EditBackgroundImageState createState() => _EditBackgroundImageState();
 }
 
-class _AddProfilePicState extends State<AddProfilePic> {
+class _EditBackgroundImageState extends State<EditBackgroundImage> {
   final UserController _userController = Get.put(UserController());
   @override
   Widget build(BuildContext context) {
@@ -36,8 +35,6 @@ class _AddProfilePicState extends State<AddProfilePic> {
               alignment: Alignment.center,
               children: [
                 Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     SizedBox(
                       height: MediaQuery.of(context).padding.top,
@@ -46,52 +43,51 @@ class _AddProfilePicState extends State<AddProfilePic> {
                       height: 72.h,
                     ),
                     Text(
-                      'Your Account has been created'.toUpperCase(),
+                      'Edit your background picture'.toUpperCase(),
                       style: TextStyle(fontSize: 5.sp),
                     ),
                     SizedBox(
-                      height: 22.h,
+                      height: 25.h,
                     ),
                     SizedBox(
-                      height: 149.h,
+                      height: 240.h,
                       child: photo != ""
                           ? Container(
                               // height: 70,width: 70,
                               decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
+                                  shape: BoxShape.rectangle,
                                   image: DecorationImage(
                                     image: NetworkImage(
                                       photo,
                                     ),
-                                    fit: BoxFit.fill,
+                                    fit: BoxFit.fitHeight,
                                   )),
                             )
                           : Container(
-                              //  height: 70,width: 70,
+                              height: 240.h,
                               decoration: const BoxDecoration(
-                                  shape: BoxShape.circle,
+                                  shape: BoxShape.rectangle,
                                   image: DecorationImage(
                                     image: AssetImage(
-                                      'assets/images/dummy.jpeg',
+                                      'assets/images/add_background_image.png',
                                     ),
                                     fit: BoxFit.fitHeight,
                                   )),
                             ),
                     ),
-                    SizedBox(
+                    /*SizedBox(
                       height: 46.h,
                     ),
                     Text(
-                      'Welcome, ${_userController.loginUser.value.name}'
-                          .toUpperCase(),
+                      'Welcome ${_userController.loginUser.value.name}!',
                       style: TextStyle(
-                          fontSize: 5.sp, fontWeight: FontWeight.w600),
-                    ),
-                    Text(
-                      'Upload a profile picture',
+                          fontSize: 6.sp, fontWeight: FontWeight.w700),
+                    ),*/
+                    /*Text(
+                      'Upload a new background picture',
                       style: TextStyle(
                           fontSize: 4.sp, fontWeight: FontWeight.w200),
-                    ),
+                    ),*/
                     SizedBox(
                       height: 20.h,
                     ),
@@ -103,7 +99,7 @@ class _AddProfilePicState extends State<AddProfilePic> {
                           getImage(ImageSource.camera);
                         } else {
                           _userController.isGuest.value = false;
-                          Get.offAll(() => const AddBackgroundImage());
+                          Get.offAll(() => const MyApp());
                         }
                       },
                       child: Container(
@@ -128,7 +124,7 @@ class _AddProfilePicState extends State<AddProfilePic> {
                     InkWell(
                       onTap: () {
                         _userController.isGuest.value = false;
-                        Get.offAll(() => const AddBackgroundImage());
+                        Get.offAll(() => const MyApp());
                       },
                       child: Container(
                         alignment: Alignment.center,
@@ -138,7 +134,7 @@ class _AddProfilePicState extends State<AddProfilePic> {
                             color: Color(0xff2F00F9),
                             borderRadius: BorderRadius.circular(10)),
                         child: Text(
-                          "Skip".toUpperCase(),
+                          "Not Now".toUpperCase(),
                           style: GoogleFonts.poppins(
                               color: Colors.white, fontSize: 5.sp),
                         ),
@@ -235,7 +231,7 @@ class _AddProfilePicState extends State<AddProfilePic> {
       // Upload image to Firebase storage and get the online link and store that link to the Cloud Firestore
       Reference userStorageReference = FirebaseStorage.instance
           .ref()
-          .child("users")
+          .child("background")
           .child('${DateTime.now().millisecondsSinceEpoch}.jpg');
       UploadTask snap = userStorageReference.putData(_image!);
       snap.whenComplete(() async {
@@ -244,7 +240,7 @@ class _AddProfilePicState extends State<AddProfilePic> {
             .collection("users")
             .doc(FirebaseAuth.instance.currentUser!.uid)
             .set({
-          "photo": photo,
+          "backgroundImage": photo,
         }, SetOptions(merge: true)).whenComplete(() {
           FirebaseFirestore.instance
               .collection("users")

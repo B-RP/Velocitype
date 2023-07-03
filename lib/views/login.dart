@@ -1,10 +1,12 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:tempo_application/controller/user_controller.dart';
 import 'package:tempo_application/main.dart';
 import 'package:tempo_application/views/register_screen.dart';
@@ -25,6 +27,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool loading = false;
   bool passObscure = true;
+
+  String exceptionMessage = '';
 
   final storage = const FlutterSecureStorage();
 
@@ -92,31 +96,48 @@ class _LoginScreenState extends State<LoginScreen> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         SizedBox(
-                          height: 20.h,
-                        ),
-                        SizedBox(
-                          height: 65.h,
+                          height: 40.h,
                         ),
                         buildLogo(),
                         SizedBox(
                           height: 10.h,
                         ),
                         Text(
-                          'Welcome back!',
+                          'Welcome back'.toUpperCase(),
                           style: TextStyle(
                               height: 0.65,
                               fontSize: 8.sp,
                               fontWeight: FontWeight.w600,
                               color: Colors.black),
                         ),
-                        SizedBox(height: 0.h),
+                        SizedBox(height: 10.h),
                         Text(
-                          'Sign in to continue',
+                          'Login to continue',
                           style: TextStyle(
                               color: const Color(0xff737373), fontSize: 4.sp),
                         ),
                         SizedBox(
-                          height: 30.h,
+                          height: 20.h,
+                        ),
+                        Visibility(
+                          visible: exceptionMessage.isNotEmpty,
+                          child: Container(
+                            width: MediaQuery.of(context).size.width * 0.35,
+                            decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.50),
+                                borderRadius: BorderRadius.circular(10.r)),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 5.w, vertical: 4.w),
+                            margin: EdgeInsets.symmetric(
+                                horizontal: 0.w, vertical: 5.w),
+                            child: Text(
+                              exceptionMessage,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ),
                         ),
                         buildTextField(
                             hint: 'Email',
@@ -196,9 +217,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                   setState(() {
                                     loading = false;
                                   });
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                      snackBar(
-                                          'Alert! Please enter all details'));
+
+                                  setState(() {
+                                    exceptionMessage =
+                                        'Alert! Please enter all details';
+                                  });
                                 }
                                 // Check if email is formatted correctly or not
                                 else if (email.text.isEmpty ||
@@ -207,9 +230,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                   setState(() {
                                     loading = false;
                                   });
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                      snackBar(
-                                          'Alert! Your email is formatted incorrectly'));
+
+                                  setState(() {
+                                    exceptionMessage =
+                                        'Alert! Your email is formatted incorrectly';
+                                  });
                                 } else {
                                   try {
                                     // If every condition fulfills then sign in user and store details of user to mobile local storage
@@ -231,6 +256,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                                 FUser.fromJson(value.data()!);
                                             _userController.loginUser.value =
                                                 fUser;
+                                            log(_userController.loginUser.value
+                                                .toString());
                                           }
                                         });
                                         getResults();
@@ -242,8 +269,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                   } on FirebaseAuthException catch (e) {
                                     setState(() {
                                       loading = false;
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(snackBar(e.message!));
+
+                                      exceptionMessage = e.message!;
                                     });
                                   }
                                 }
@@ -257,8 +284,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                   vertical: 10.h,
                                 ),
                                 child: Text(
-                                  'Login',
-                                  style: TextStyle(
+                                  'Sign in'.toUpperCase(),
+                                  style: GoogleFonts.poppins(
                                       color: Colors.white, fontSize: 6.sp),
                                 ),
                               ),
@@ -272,7 +299,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'New user?',
+                              'Don\'t have an account?',
                               style: TextStyle(
                                   fontSize: 4.sp,
                                   color: const Color(0xff737373)),
@@ -282,7 +309,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   Get.to(() => const RegisterScreen());
                                 },
                                 child: Text(
-                                  '  Register',
+                                  ' Register',
                                   style: TextStyle(
                                       color: const Color(0xffE98445),
                                       fontSize: 4.sp),
@@ -298,7 +325,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   Get.to(() => const MyApp());
                                 },
                                 child: Text(
-                                  'Guest account',
+                                  'Continue as Guest',
                                   style: TextStyle(
                                       color: Color(0xff2F00F9), fontSize: 4.sp),
                                 )),
@@ -352,8 +379,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget buildLogo() {
     return SizedBox(
-      height: 200.h,
-      width: 200.h,
+      height: 300.h,
+      width: 300.h,
       child: Image.asset('assets/images/new.PNG'),
     );
   }

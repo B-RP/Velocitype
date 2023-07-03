@@ -1,9 +1,14 @@
+import 'dart:core';
+import 'dart:core';
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:tempo_application/controller/user_controller.dart';
 import 'package:tempo_application/views/add_profile_pic.dart';
 
@@ -27,6 +32,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool passObscure = true;
   bool confirmPassObscure = true;
   bool loading = false;
+  String nameError = '';
+  String emailError = '';
+  String passwordError = '';
+  String passwordNotMatched = '';
+  String exceptionMessage = '';
 
   final UserController _userController = Get.put(UserController());
 
@@ -89,7 +99,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           height: 35.h,
                         ),
                         Text(
-                          'Create Account',
+                          'New Here?'.toUpperCase(),
                           style: TextStyle(
                               height: 0.65,
                               fontSize: 6.sp,
@@ -106,124 +116,226 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           height: 20.h,
                         ),
                         // User name Text field with _name controller and Person Icon
-                        buildTextField(
-                            hint: 'Name',
-                            controller: _name,
-                            icon: const Icon(
-                              Icons.person,
-                              color: Colors.grey,
-                              size: 20,
-                            )),
+
+                        Column(
+                          // mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Visibility(
+                              visible: exceptionMessage.isNotEmpty,
+                              child: Container(
+                                width: MediaQuery.of(context).size.width * 0.35,
+                                decoration: BoxDecoration(
+                                    color: Colors.black.withOpacity(0.50),
+                                    borderRadius: BorderRadius.circular(10.r)),
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 5.w, vertical: 4.w),
+                                margin: EdgeInsets.symmetric(
+                                    horizontal: 0.w, vertical: 5.w),
+                                child: Text(
+                                  exceptionMessage,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Container(
+                              width: MediaQuery.of(context).size.width * 0.35,
+                              decoration: BoxDecoration(
+                                  color: Colors.grey.withOpacity(0.10),
+                                  borderRadius: BorderRadius.circular(10.r)),
+                              padding: EdgeInsets.symmetric(horizontal: 12.w),
+                              margin: EdgeInsets.symmetric(horizontal: 0.w),
+                              child: TextFormField(
+                                style: TextStyle(
+                                    color: Colors.black54,
+                                    fontSize: 5.sp,
+                                    fontWeight: FontWeight.normal),
+                                controller: _name,
+                                decoration: InputDecoration(
+                                  prefixIcon: Icon(
+                                    Icons.person,
+                                    color: Colors.grey,
+                                    size: 20,
+                                  ),
+                                  contentPadding:
+                                      EdgeInsets.symmetric(vertical: 12.h),
+                                  border: InputBorder.none,
+                                  hintText: 'Name',
+                                  hintStyle: TextStyle(
+                                      fontSize: 5.sp,
+                                      color: const Color(0xff737373),
+                                      fontWeight: FontWeight.normal),
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 60.0, top: 6.0, bottom: 0.0),
+                              child: Text(
+                                nameError,
+                                style:
+                                    TextStyle(color: Colors.red, fontSize: 12),
+                              ),
+                            )
+                          ],
+                        ),
+
                         SizedBox(
                           height: 14.5.h,
                         ),
-                        buildTextField(
-                            hint: 'Email',
-                            controller: _email,
-                            icon: const Icon(
-                              Icons.email,
-                              color: Colors.grey,
-                              size: 20,
-                            )),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            buildTextField(
+                                hint: 'Email',
+                                controller: _email,
+                                icon: const Icon(
+                                  Icons.email,
+                                  color: Colors.grey,
+                                  size: 20,
+                                )),
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 60.0, top: 6.0, bottom: 0.0),
+                              child: Text(
+                                emailError,
+                                style:
+                                    TextStyle(color: Colors.red, fontSize: 12),
+                              ),
+                            )
+                          ],
+                        ),
+
                         SizedBox(
                           height: 14.h,
                         ),
-                        Container(
-                          width: MediaQuery.of(context).size.width * .35,
-                          decoration: BoxDecoration(
-                              color: Colors.grey.withOpacity(0.10),
-                              borderRadius: BorderRadius.circular(10.r)),
-                          padding: EdgeInsets.symmetric(horizontal: 12.w),
-                          margin: EdgeInsets.symmetric(horizontal: 0.w),
-                          child: TextField(
-                            style: TextStyle(
-                                color: Colors.black54,
-                                fontSize: 5.sp,
-                                fontWeight: FontWeight.normal),
-                            controller: _password,
-                            obscureText: passObscure,
-                            decoration: InputDecoration(
-                                focusColor: Colors.white70,
-                                prefixIcon: const Icon(
-                                  Icons.lock,
-                                  color: Colors.grey,
-                                  size: 20,
-                                ),
-                                suffixIcon: GestureDetector(
-                                  child: Icon(
-                                    passObscure == true
-                                        ? Icons.visibility
-                                        : Icons.visibility_off,
-                                    color: Colors.grey,
-                                  ),
-                                  // If user press unhide icon then password will be visible to user
-                                  onTap: () {
-                                    setState(() {
-                                      if (passObscure == true) {
-                                        passObscure = false;
-                                      } else
-                                        passObscure = true;
-                                    });
-                                  },
-                                ),
-                                contentPadding:
-                                    EdgeInsets.symmetric(vertical: 12.h),
-                                border: InputBorder.none,
-                                hintText: "Password",
-                                hintStyle: TextStyle(
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: MediaQuery.of(context).size.width * .35,
+                              decoration: BoxDecoration(
+                                  color: Colors.grey.withOpacity(0.10),
+                                  borderRadius: BorderRadius.circular(10.r)),
+                              padding: EdgeInsets.symmetric(horizontal: 12.w),
+                              margin: EdgeInsets.symmetric(horizontal: 0.w),
+                              child: TextField(
+                                style: TextStyle(
+                                    color: Colors.black54,
                                     fontSize: 5.sp,
-                                    color: const Color(0xff737373),
-                                    fontWeight: FontWeight.normal)),
-                          ),
+                                    fontWeight: FontWeight.normal),
+                                controller: _password,
+                                obscureText: passObscure,
+                                decoration: InputDecoration(
+                                    focusColor: Colors.white70,
+                                    prefixIcon: const Icon(
+                                      Icons.lock,
+                                      color: Colors.grey,
+                                      size: 20,
+                                    ),
+                                    suffixIcon: GestureDetector(
+                                      child: Icon(
+                                        passObscure == true
+                                            ? Icons.visibility
+                                            : Icons.visibility_off,
+                                        color: Colors.grey,
+                                      ),
+                                      // If user press unhide icon then password will be visible to user
+                                      onTap: () {
+                                        setState(() {
+                                          if (passObscure == true) {
+                                            passObscure = false;
+                                          } else
+                                            passObscure = true;
+                                        });
+                                      },
+                                    ),
+                                    contentPadding:
+                                        EdgeInsets.symmetric(vertical: 12.h),
+                                    border: InputBorder.none,
+                                    hintText: "Password",
+                                    hintStyle: TextStyle(
+                                        fontSize: 5.sp,
+                                        color: const Color(0xff737373),
+                                        fontWeight: FontWeight.normal)),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 60.0, top: 6.0, bottom: 0.0),
+                              child: Text(
+                                passwordError,
+                                style:
+                                    TextStyle(color: Colors.red, fontSize: 12),
+                              ),
+                            )
+                          ],
                         ),
                         SizedBox(
                           height: 14.5.h,
                         ),
-                        Container(
-                          width: MediaQuery.of(context).size.width * .35,
-                          decoration: BoxDecoration(
-                              color: Colors.grey.withOpacity(0.10),
-                              borderRadius: BorderRadius.circular(10.r)),
-                          padding: EdgeInsets.symmetric(horizontal: 12.w),
-                          margin: EdgeInsets.symmetric(horizontal: 0.w),
-                          child: TextField(
-                            style: TextStyle(
-                                color: Colors.black54,
-                                fontSize: 5.sp,
-                                fontWeight: FontWeight.normal),
-                            controller: _confirmPassword,
-                            obscureText: confirmPassObscure,
-                            decoration: InputDecoration(
-                                prefixIcon: const Icon(
-                                  Icons.lock,
-                                  color: Colors.grey,
-                                  size: 20,
-                                ),
-                                suffixIcon: GestureDetector(
-                                  child: Icon(
-                                    confirmPassObscure == true
-                                        ? Icons.visibility
-                                        : Icons.visibility_off,
-                                    color: Colors.grey,
-                                  ),
-                                  onTap: () {
-                                    setState(() {
-                                      if (confirmPassObscure == true) {
-                                        confirmPassObscure = false;
-                                      } else
-                                        confirmPassObscure = true;
-                                    });
-                                  },
-                                ),
-                                contentPadding:
-                                    EdgeInsets.symmetric(vertical: 6.h),
-                                border: InputBorder.none,
-                                hintText: 'Confirm password',
-                                hintStyle: TextStyle(
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: MediaQuery.of(context).size.width * .35,
+                              decoration: BoxDecoration(
+                                  color: Colors.grey.withOpacity(0.10),
+                                  borderRadius: BorderRadius.circular(10.r)),
+                              padding: EdgeInsets.symmetric(horizontal: 12.w),
+                              margin: EdgeInsets.symmetric(horizontal: 0.w),
+                              child: TextField(
+                                style: TextStyle(
+                                    color: Colors.black54,
                                     fontSize: 5.sp,
-                                    color: const Color(0xff737373),
-                                    fontWeight: FontWeight.normal)),
-                          ),
+                                    fontWeight: FontWeight.normal),
+                                controller: _confirmPassword,
+                                obscureText: confirmPassObscure,
+                                decoration: InputDecoration(
+                                    prefixIcon: const Icon(
+                                      Icons.lock,
+                                      color: Colors.grey,
+                                      size: 20,
+                                    ),
+                                    suffixIcon: GestureDetector(
+                                      child: Icon(
+                                        confirmPassObscure == true
+                                            ? Icons.visibility
+                                            : Icons.visibility_off,
+                                        color: Colors.grey,
+                                      ),
+                                      onTap: () {
+                                        setState(() {
+                                          if (confirmPassObscure == true) {
+                                            confirmPassObscure = false;
+                                          } else
+                                            confirmPassObscure = true;
+                                        });
+                                      },
+                                    ),
+                                    contentPadding:
+                                        EdgeInsets.symmetric(vertical: 6.h),
+                                    border: InputBorder.none,
+                                    hintText: 'Confirm password',
+                                    hintStyle: TextStyle(
+                                        fontSize: 5.sp,
+                                        color: const Color(0xff737373),
+                                        fontWeight: FontWeight.normal)),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 60.0, top: 6.0, bottom: 0.0),
+                              child: Text(
+                                passwordNotMatched,
+                                style:
+                                    TextStyle(color: Colors.red, fontSize: 12),
+                              ),
+                            )
+                          ],
                         ),
                         SizedBox(
                           height: 30.h,
@@ -244,45 +356,75 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               if (!notEmpty) {
                                 setState(() {
                                   loading = false;
+                                  nameError = 'Name can\'t be empty';
+                                  emailError = 'Email can\'t be empty';
+                                  passwordError =
+                                      'Password can\'t be less than 8 characters';
                                 });
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    snackBar('Please fill all details'));
-                              } else if (_name.text.isEmpty) {
+                              }
+                              if (_name.text.isEmpty) {
                                 setState(() {
                                   loading = false;
+                                  nameError = 'Name can\'t be empty';
+                                  emailError = '';
+                                  passwordError = '';
                                 });
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    snackBar('Please enter your name'));
-                              } else if (_email.text.isEmpty ||
+                                /*   ScaffoldMessenger.of(context).showSnackBar(
+                                    snackBar('Please enter your name'));*/
+                              } else {
+                                setState(() {
+                                  loading = false;
+                                  nameError = '';
+                                });
+                              }
+                              if (_email.text.isEmpty ||
                                   !(_email.text.contains("@")) ||
                                   !(_email.text.contains("."))) {
                                 setState(() {
                                   loading = false;
+                                  emailError = 'Email must contain @ and .';
                                 });
-                                ScaffoldMessenger.of(context).showSnackBar(snackBar(
-                                    'Alert! Your email is formatted incorrectly'));
-                              } else if (_password.text.isEmpty ||
-                                  (_password.text.length < 7)) {
-                                setState(() {
-                                  loading = false;
-                                });
-                                ScaffoldMessenger.of(context).showSnackBar(snackBar(
-                                    'Please enter a password with at least 8 digits'));
-                              } else if (_password.text.isEmpty ||
-                                  (_password.text.length < 7)) {
-                                setState(() {
-                                  loading = false;
-                                });
-                                ScaffoldMessenger.of(context).showSnackBar(snackBar(
-                                    'Please enter a password with at least 8 digits'));
-                              } else if (_password.text !=
-                                  (_confirmPassword.text)) {
-                                setState(() {
-                                  loading = false;
-                                });
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    snackBar('Your password doesn\'t match'));
+                                /*ScaffoldMessenger.of(context).showSnackBar(snackBar(
+                                    'Alert! Your email is formatted incorrectly'));*/
                               } else {
+                                setState(() {
+                                  loading = false;
+                                  emailError = '';
+                                });
+                              }
+                              if (_password.text.isEmpty ||
+                                  (_password.text.length < 7)) {
+                                setState(() {
+                                  loading = false;
+                                  passwordError =
+                                      'Password must be at least 8 characters';
+                                });
+                                /*ScaffoldMessenger.of(context).showSnackBar(snackBar(
+                                    'Please enter a password with at least 8 characters'));*/
+                              } else {
+                                setState(() {
+                                  loading = false;
+                                  passwordError = '';
+                                });
+                              }
+                              if (_password.text != (_confirmPassword.text)) {
+                                setState(() {
+                                  loading = false;
+                                  passwordNotMatched = 'Passwords do not match';
+                                });
+                                /*ScaffoldMessenger.of(context).showSnackBar(
+                                    snackBar('Your password doesn\'t match'));*/
+                              } else {
+                                setState(() {
+                                  loading = false;
+                                  passwordNotMatched = '';
+                                });
+                              }
+
+                              if (emailError == '' &&
+                                  passwordError == '' &&
+                                  emailError == '' &&
+                                  passwordNotMatched == '') {
                                 try {
                                   // Register user with email and password
                                   FirebaseAuth _auth = FirebaseAuth.instance;
@@ -328,8 +470,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   setState(() {
                                     loading = false;
                                   });
-                                  ScaffoldMessenger.of(context)
-                                      .showSnackBar(snackBar(e.message!));
+                                  log('Exceptttion $e');
+                                  setState(() {
+                                    exceptionMessage = e.message!;
+                                  });
+                                  /* ScaffoldMessenger.of(context)
+                                      .showSnackBar(snackBar(e.message!));*/
                                 }
                               }
                             },
@@ -343,8 +489,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   color: Color(0xff2F00F9),
                                   borderRadius: BorderRadius.circular(10.r)),
                               child: Text(
-                                'Create account',
-                                style: TextStyle(
+                                'Register'.toUpperCase(),
+                                style: GoogleFonts.poppins(
                                     color: Colors.white, fontSize: 5.sp),
                               ),
                             ),
@@ -368,7 +514,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   Get.to(() => const LoginScreen());
                                 },
                                 child: Text(
-                                  ' Log In',
+                                  ' Login',
                                   style: TextStyle(
                                       color: Color.fromARGB(255, 197, 3, 250),
                                       fontSize: 4.sp),

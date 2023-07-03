@@ -43,7 +43,7 @@ dependencies:
   cloud_firestore: ^4.0.3
   google_sign_in: ^5.4.2
   fluttertoast: ^8.1.1
-  google_fonts: ^3.0.1
+  google_fonts: ^5.1.0
   flutter_secure_storage: ^6.0.0
   flutter_screenutil: ^5.6.0
   firebase_storage: ^11.0.4

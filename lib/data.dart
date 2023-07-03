@@ -22,9 +22,9 @@ class Data {
     var correctWords = totalWords - totalIncWords;
     var wordAcc = correctWords / totalWords;
 
-    wordAccuracy = wordAcc * 100;
+    wordAccuracy = (wordAcc * 100);
 
-    return wordAcc * 100;
+    return (wordAcc * 100);
   }
 
   static double calcKeyAccuracy() {

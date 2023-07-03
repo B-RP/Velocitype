@@ -9,6 +9,7 @@ import 'package:tempo_application/views/login.dart';
 import '../main.dart';
 import '../model/result_record.dart';
 import '../model/user_model.dart';
+import 'edit_profile.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -24,7 +25,7 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       body: Center(
         child: SizedBox(
-            height: 400, child: Image.asset('assets/images/logoGif.gif')),
+            height: 500, child: Image.asset('assets/images/logoGif.gif')),
       ),
     );
   }
@@ -73,6 +74,7 @@ class _SplashScreenState extends State<SplashScreen> {
           getResults();
           // Navigate user to Home page
           Get.offAll(() => const MyApp());
+          // Get.offAll(() => const EditProfile());
         }
       } on FirebaseAuthException catch (e) {
         snackBar(e.message.toString());

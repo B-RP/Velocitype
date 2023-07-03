@@ -10,10 +10,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:tempo_application/controller/user_controller.dart';
 import 'package:tempo_application/controller/words_controller.dart';
 import 'package:tempo_application/model/result_record.dart';
+import 'package:tempo_application/views/add_background_image.dart';
 import 'package:tempo_application/views/add_profile_pic.dart';
 import 'package:tempo_application/views/login.dart';
 import 'package:tempo_application/views/splash_screen.dart';
@@ -27,17 +29,15 @@ Future<void> main() async {
     // options: DefaultFirebaseOptions.currentPlatform,
 
     options: const FirebaseOptions(
-      apiKey: "AIzaSyCo1YdvFr51U6_qf9cqu3e5n68Fq8XdiaA",
-      authDomain: "tempo-app-b2bb7.firebaseapp.com",
-      projectId: "tempo-app-b2bb7",
-      storageBucket: "tempo-app-b2bb7.appspot.com",
-      messagingSenderId: "607142924875",
-      appId: "1:607142924875:web:3772b01be6f10f17cf73ce",
-      measurementId: "G-8EQ3ZQYKQ1",
-    ),
+        apiKey: "AIzaSyBeDZzmHDrp8nmTrWNjHX8vBoVQUmd3xhA",
+        authDomain: "velocitype-c4e92.firebaseapp.com",
+        projectId: "velocitype-c4e92",
+        storageBucket: "velocitype-c4e92.appspot.com",
+        messagingSenderId: "677022620040",
+        appId: "1:677022620040:web:cc16de75779019731f823d",
+        measurementId: "G-QBZYVGCFTZ"),
   );
-  runApp(const GetMaterialApp(
-      home: SplashScreen())); // App moves to the splash screen
+  runApp(GetMaterialApp(home: SplashScreen()));
 }
 
 // This MyApp screen is actually home page when user login then this screen opens
@@ -89,21 +89,27 @@ class _MainPageState extends State<MainPage> {
   final GlobalKey<_CountdownTimerState> _timerKey = GlobalKey();
   final GlobalKey<_InteractionRowState> _InterRowKey = GlobalKey();
   final WordsController _wordsController = Get.put(WordsController());
+  final UserController _userController = Get.put(UserController());
 
   @override
   Widget build(BuildContext context) {
-    //double appWidth = MediaQuery.of(context).size.width;
-
     return Scaffold(
-        body: Container(
+        body: Obx(() => Container(
             decoration: BoxDecoration(
                 image: DecorationImage(
-                    fit: BoxFit.cover,
-                    colorFilter: ColorFilter.mode(
-                        Colors.black.withOpacity(0.5), BlendMode.darken),
-                    image: const AssetImage(
-                      "assets/images/background.png",
-                    ))),
+              fit: BoxFit.cover,
+              colorFilter: ColorFilter.mode(
+                  Colors.black.withOpacity(0.5), BlendMode.darken),
+              image: (_userController.isGuest.value == true)
+                  ? AssetImage("assets/images/background.png")
+                      as ImageProvider<Object>
+                  : (_userController.loginUser.value.backgroundImage == "")
+                      ? AssetImage("assets/images/background.png")
+                          as ImageProvider<Object>
+                      : NetworkImage(
+                          _userController.loginUser.value.backgroundImage,
+                        ) as ImageProvider<Object>,
+            )),
             child: Padding(
                 padding: const EdgeInsets.all(100),
                 child: Column(
@@ -148,14 +154,17 @@ class _MainPageState extends State<MainPage> {
                                 _timerKey.currentState?.startTimer();
                               },
                               checkWord: () {
+                                log('Check Word');
                                 if (Data.checkWord(
                                     Data.inputTyped, Data.targetWord)) {
+                                  log("Change word Color");
                                   _wordKey.currentState?.changeColor("g");
                                 } else {
                                   _wordKey.currentState?.changeColor("r");
                                 }
                               },
                               checkFullWord: () {
+                                log('Check Full Word');
                                 if (Data.checkFullWord(
                                     Data.inputTyped, Data.targetWord)) {
                                   _wordKey.currentState?.changeColor("g");
@@ -163,7 +172,7 @@ class _MainPageState extends State<MainPage> {
                                   _wordKey.currentState?.changeColor("r");
                                 }
                               }))
-                    ]))));
+                    ])))));
   }
 }
 
@@ -461,6 +470,9 @@ class _InteractionRowState extends State<InteractionRow> {
 
   //this function is called when the timer ends and the test is finished
   void showMenu() {
+    // double wordAccuracy =
+    //     double.parse(_userController.records.last.wordAccuracy);
+
     try {
       if ((_userController.isGuest.value == false)) {
         FirebaseFirestore.instance
@@ -509,31 +521,68 @@ class _InteractionRowState extends State<InteractionRow> {
                       width: MediaQuery.of(context).size.width * .40,
                       child: Column(
                         children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 8.0, horizontal: 8.0),
-                            child: Row(
-                              children: [
-                                const Spacer(),
-                                GestureDetector(
-                                    onTap: () {
-                                      Navigator.of(context).pop();
-                                      Get.back(); // This line close the pop up
-                                    },
-                                    child: Icon(
-                                      Icons.close,
-                                      size: 35,
-                                      color: Colors.grey,
-                                    ))
-                              ],
-                            ),
+                          // Padding(
+                          //   padding: const EdgeInsets.symmetric(
+                          //       vertical: 8.0, horizontal: 8.0),
+                          //   child: Row(
+                          //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          //     children: [
+                          //      Container(),
+                          //       Center(
+                          //         child: Text(
+                          //           'RESULTS'.toUpperCase(),
+                          //           style: GoogleFonts.poppins(
+                          //               color: const Color(0xff2F00F9), fontSize: 28),
+                          //         ),
+                          //       ),
+                          //       GestureDetector(
+                          //           onTap: () {
+                          //             Navigator.of(context).pop();
+                          //             Get.back(); // This line close the pop up
+                          //           },
+                          //           child: Icon(
+                          //             Icons.close,
+                          //             size: 35,
+                          //             color: Colors.grey,
+                          //           ))
+                          //     ],
+                          //   ),
+                          // ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              GestureDetector(
+                                  onTap: () {
+                                    Navigator.of(context).pop();
+                                    Get.back(); // This line close the pop up
+                                  },
+                                  child: Icon(
+                                    Icons.close,
+                                    size: 35,
+                                    color: Colors.grey,
+                                  ))
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Center(
+                                child: Text(
+                                  'RESULT'.toUpperCase(),
+                                  style: GoogleFonts.poppins(
+                                      color: const Color(0xff2F00F9),
+                                      fontSize: 28,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                              ),
+                            ],
                           ),
                           Container(
                             margin:
                                 const EdgeInsets.symmetric(horizontal: 50.0),
                             child: Card(
                               //Card with circular border
-                              color: Colors.white.withOpacity(0.75),
+                              color: Color(0xFFD9DDE0),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(0.0),
                               ),
@@ -547,8 +596,8 @@ class _InteractionRowState extends State<InteractionRow> {
                                       padding: EdgeInsets.only(bottom: 10.0),
                                       child: Center(
                                           child: Text(
-                                        Data.totalWords.toString(),
-                                        style: const TextStyle(
+                                        '${Data.totalWords.toString()} WPM',
+                                        style: GoogleFonts.poppins(
                                             fontSize: 28,
                                             color: Color(0xff2F00F9),
                                             fontWeight: FontWeight.bold),
@@ -559,217 +608,241 @@ class _InteractionRowState extends State<InteractionRow> {
                                     ),
                                     Row(
                                       mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: const [
-                                        Text(
-                                          "Date ",
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          width: 10.0,
-                                        ),
-                                        Text(
-                                          "Time ",
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Text(
-                                          //THis line will use to convert String of time into Date and Tme Format and then converting it into 2022-12-28 this format
-                                          DateFormat('yyyy-MM-dd').format(
-                                              DateTime.parse(_userController
-                                                  .records.last.time)),
+                                        SizedBox(
+                                          width: 40.0,
                                         ),
-                                        const SizedBox(
-                                          width: 10.0,
-                                        ),
-                                        const Text(
-                                          // Get exact time from Date and Time
-                                          /*DateFormat.Hms().format(DateTime.parse(
-                                        _userController.records
-                                                  .elementAt(index)
-                                                  .time))*/
-                                          "60 sec",
-                                        ),
-                                      ],
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 12.0),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              const Text(
-                                                "Keystrokes: ",
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                              const SizedBox(
-                                                width: 40.0,
-                                              ),
-                                              Text(
-                                                //index hold the values of current element
-                                                Data.calcKeyAccuracy()
-                                                    .toString(),
-                                              ),
-                                            ],
-                                          ),
-                                          Row(
-                                            children: [
-                                              const Text(
-                                                "Word Acc: ",
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                              const SizedBox(
-                                                width: 10.0,
-                                              ),
-                                              Text(
-                                                  //index hold the values of current element
-                                                  Data.calcWordAccuracy()
-                                                      .toString()),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 12.0),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              const Text(
-                                                "Accuracy: ",
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                              const SizedBox(
-                                                width: 40.0,
-                                              ),
-                                              Text(
-                                                "${((Data.totalWords - Data.totalIncWords) * 100) ~/ Data.totalWords}%",
-                                                style: TextStyle(
-                                                    color: ((((Data.totalWords -
-                                                                        Data
-                                                                            .totalIncWords) *
-                                                                    100) ~/
-                                                                Data
-                                                                    .totalWords) <
-                                                            50
-                                                        ? Colors.red
-                                                        : Colors.green),
-                                                    fontSize: 18,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                            ],
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 12.0),
-                                            child: Row(
+                                        Expanded(
+                                            child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
+                                          children: [
+                                            Row(
                                               children: [
-                                                const Text(
-                                                  "WPM: ",
-                                                  style: TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      "Date".toUpperCase(),
+                                                      style:
+                                                          GoogleFonts.poppins(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 20.0,
+                                                    ),
+                                                    Text(
+                                                      "Keystrokes: "
+                                                          .toUpperCase(),
+                                                      style:
+                                                          GoogleFonts.poppins(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 20.0,
+                                                    ),
+                                                    Text(
+                                                      "Accuracy: "
+                                                          .toUpperCase(),
+                                                      style:
+                                                          GoogleFonts.poppins(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 20.0,
+                                                    ),
+                                                    Text(
+                                                      "Correct Words: "
+                                                          .toUpperCase(),
+                                                      style:
+                                                          GoogleFonts.poppins(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 20.0,
+                                                    ),
+                                                  ],
                                                 ),
-                                                const SizedBox(
-                                                  width: 10.0,
+                                                SizedBox(
+                                                  width: 20.0,
                                                 ),
-                                                Text(
-                                                  //"${(_userController.records.last.score * 100) ~/ 40}%",
-                                                  Data.totalWords.toString(),
-                                                  style: TextStyle(
-                                                      color: ((int.parse(
-                                                                  _userController
-                                                                      .records
-                                                                      .last
-                                                                      .score)) <
-                                                              50
-                                                          ? Colors.red
-                                                          : Colors.green),
-                                                      fontSize: 18,
-                                                      fontWeight:
-                                                          FontWeight.bold),
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      //THis line will use to convert String of time into Date and Tme Format and then converting it into 2022-12-28 this format
+                                                      DateFormat('yyyy-MM-dd')
+                                                          .format(DateTime.parse(
+                                                              _userController
+                                                                  .records
+                                                                  .last
+                                                                  .time)),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 20.0,
+                                                    ),
+                                                    Text(
+                                                      //index hold the values of current element
+                                                      _userController.records
+                                                          .last.keyStrokes,
+                                                    ),
+                                                    SizedBox(
+                                                      width: 20.0,
+                                                    ),
+                                                    Text(
+                                                      "${_userController.records.last.accuracy}%",
+                                                      style: TextStyle(
+                                                          color: ((int.parse(
+                                                                      _userController
+                                                                          .records
+                                                                          .last
+                                                                          .accuracy)) <
+                                                                  50
+                                                              ? Colors.red
+                                                              : Colors.green),
+                                                          fontSize: 18,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 20.0,
+                                                    ),
+                                                    Text(
+                                                      //index hold the values of current element
+                                                      _userController.records
+                                                          .last.correctWords
+                                                          .toString(),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 20.0,
+                                                    ),
+                                                  ],
                                                 ),
                                               ],
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      children: [
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 12.0),
-                                          child: Row(
-                                            children: [
-                                              const Text(
-                                                "Correct Words: ",
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
+                                          ],
+                                        )),
+                                        Expanded(
+                                            child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      "Time ".toUpperCase(),
+                                                      style:
+                                                          GoogleFonts.poppins(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 20.0,
+                                                    ),
+                                                    Text(
+                                                      "Word Acc: "
+                                                          .toUpperCase(),
+                                                      style:
+                                                          GoogleFonts.poppins(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 20.0,
+                                                    ),
+                                                    Text(
+                                                      "WPM: ".toUpperCase(),
+                                                      style:
+                                                          GoogleFonts.poppins(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 20.0,
+                                                    ),
+                                                    Text(
+                                                      "Wrong words: "
+                                                          .toUpperCase(),
+                                                      style:
+                                                          GoogleFonts.poppins(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 20.0,
+                                                    ),
+                                                  ],
                                                 ),
-                                              ),
-                                              const SizedBox(
-                                                width: 40.0,
-                                              ),
-                                              Text(
-                                                //index hold the values of current element
-                                                (Data.totalWords -
-                                                        Data.totalIncWords)
-                                                    .toString(),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 12.0),
-                                          child: Row(
-                                            children: [
-                                              const Text(
-                                                "Wrong words: ",
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
+                                                SizedBox(
+                                                  width: 20.0,
                                                 ),
-                                              ),
-                                              const SizedBox(
-                                                width: 40.0,
-                                              ),
-                                              Text(
-                                                //index hold the values of current element
-                                                '${Data.totalIncWords}',
-                                              ),
-                                            ],
-                                          ),
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      "60 sec",
+                                                    ),
+                                                    SizedBox(
+                                                      width: 20.0,
+                                                    ),
+                                                    Text(
+                                                        //index hold the values of current element
+                                                        /*wordAccuracy
+                                                          .toStringAsFixed(2)
+                                                          .toString(),*/
+                                                        _userController.records
+                                                            .last.wordAccuracy),
+                                                    SizedBox(
+                                                      width: 20.0,
+                                                    ),
+                                                    Text(
+                                                      //"${(_userController.records.last.score * 100) ~/ 40}%",
+                                                      _userController
+                                                          .records.last.wpm,
+                                                      style: TextStyle(
+                                                          fontSize: 18,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 20.0,
+                                                    ),
+                                                    Text(
+                                                      //index hold the values of current element
+                                                      _userController.records
+                                                          .last.wrongWords,
+                                                    ),
+                                                    SizedBox(
+                                                      width: 20.0,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        )),
+                                        SizedBox(
+                                          width: 40.0,
                                         ),
                                       ],
                                     ),
@@ -785,62 +858,39 @@ class _InteractionRowState extends State<InteractionRow> {
                 ),
                 actions: <Widget>[
                   _userController.isGuest.value == false
-                      ? TextButton(
-                          child: Text(
-                            'Take test again'.toUpperCase(),
-                            style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xff2F00F9)),
+                      ? Center(
+                          child: InkWell(
+                            onTap: () async {
+                              Navigator.of(context)
+                                  .pop(); // This line close the pop up
+                              _wordsController.index.value = 0;
+                              _wordsController.score.value = 0;
+
+                              //widget.
+                              //Code to open screen MyApp
+                              // Get.off(() => const MyApp()); // breaks for whatever reason
+                            },
+                            child: Container(
+                              width: 320,
+                              height: 48,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                  color: const Color(0xff2F00F9),
+                                  borderRadius: BorderRadius.circular(10.r)),
+                              // padding: EdgeInsets.symmetric(
+                              //   vertical: 10.h,
+                              // ),
+                              child: Text(
+                                'Take test again'.toUpperCase(),
+                                style: GoogleFonts.poppins(
+                                    color: Colors.white, fontSize: 5.sp),
+                              ),
+                            ),
                           ),
-                          onPressed: () {
-                            Navigator.of(context)
-                                .pop(); // This line close the pop up
-                            //_wordsController.index.value = 0;
-                            //_wordsController.score.value = 0;
-                            //widget.
-                            //Code to open screen MyApp
-                            // Get.off(() => const MyApp()); // breaks for whatever reason
-                          },
                         )
                       : const SizedBox(),
                   (_userController.isGuest.value == false)
-                      ? TextButton(
-                          child: const Text(
-                            'SHOW PAST RESULTS',
-                            style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xff2F00F9)),
-                          ),
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                            _wordsController.index.value = 0;
-                            _wordsController.score.value = 0;
-                            //Code to open screen MyApp
-                            Get.off(() => const MyApp());
-                            showGeneralDialog(
-                              context: context,
-                              pageBuilder: (ctx, a1, a2) {
-                                return Menu(context);
-                              },
-                              transitionBuilder: (context, animation,
-                                  secondaryAnimation, child) {
-                                const begin = Offset(0.0, 1.0);
-                                const end = Offset.zero;
-                                const curve = Curves.ease;
-
-                                var tween = Tween(begin: begin, end: end)
-                                    .chain(CurveTween(curve: curve));
-
-                                return SlideTransition(
-                                  position: animation.drive(tween),
-                                  child: child,
-                                );
-                              },
-                            );
-                          },
-                        )
+                      ? Container()
                       : const SizedBox(),
                 ],
               );
@@ -856,8 +906,8 @@ class _InteractionRowState extends State<InteractionRow> {
           _userController.records.add(ResultRecord(
             score: Data.totalWords.toString(),
             time: DateTime.now().toString(),
-            keyStrokes: Data.calcKeyAccuracy().toString(),
-            wordAccuracy: Data.calcWordAccuracy().toString(),
+            keyStrokes: Data.calcKeyAccuracy().toStringAsFixed(2),
+            wordAccuracy: Data.calcWordAccuracy().toStringAsFixed(2),
             accuracy: (((Data.totalWords - Data.totalIncWords) * 100) ~/
                     Data.totalWords)
                 .toString(),
@@ -908,7 +958,7 @@ class _InteractionRowState extends State<InteractionRow> {
                                 const EdgeInsets.symmetric(horizontal: 50.0),
                             child: Card(
                               //Card with circular border
-                              color: Colors.white.withOpacity(0.75),
+                              color: Color(0xFFD9DDE0),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(0.0),
                               ),
@@ -919,11 +969,12 @@ class _InteractionRowState extends State<InteractionRow> {
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     Padding(
-                                      padding: EdgeInsets.only(bottom: 10.0),
+                                      padding:
+                                          const EdgeInsets.only(bottom: 10.0),
                                       child: Center(
                                           child: Text(
                                         "${_userController.records.last.wpm} WPM",
-                                        style: TextStyle(
+                                        style: GoogleFonts.poppins(
                                             fontSize: 28,
                                             color: Color(0xff2F00F9),
                                             fontWeight: FontWeight.bold),
@@ -934,211 +985,236 @@ class _InteractionRowState extends State<InteractionRow> {
                                     ),
                                     Row(
                                       mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: const [
-                                        Text(
-                                          "Date ",
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          width: 10.0,
-                                        ),
-                                        Text(
-                                          "Time ",
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                          MainAxisAlignment.center,
                                       children: [
-                                        Text(
-                                          //THis line will use to convert String of time into Date and Tme Format and then converting it into 2022-12-28 this format
-                                          DateFormat('yyyy-MM-dd').format(
-                                              DateTime.parse(_userController
-                                                  .records.last.time)),
+                                        SizedBox(
+                                          width: 40.0,
                                         ),
-                                        const SizedBox(
-                                          width: 10.0,
-                                        ),
-                                        const Text(
-                                          // Get exact time from Date and Time
-                                          /*DateFormat.Hms().format(DateTime.parse(
-                                        _userController.records
-                                                  .elementAt(index)
-                                                  .time))*/
-                                          "60 sec",
-                                        ),
-                                      ],
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 12.0),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              const Text(
-                                                "Keystrokes: ",
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                              const SizedBox(
-                                                width: 40.0,
-                                              ),
-                                              Text(
-                                                //index hold the values of current element
-                                                _userController
-                                                    .records.last.keyStrokes,
-                                              ),
-                                            ],
-                                          ),
-                                          Row(
-                                            children: [
-                                              const Text(
-                                                "Word Acc: ",
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                              const SizedBox(
-                                                width: 10.0,
-                                              ),
-                                              Text(
-                                                  //index hold the values of current element
-                                                  _userController.records.last
-                                                      .wordAccuracy),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 12.0),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              const Text(
-                                                "Accuracy: ",
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                              const SizedBox(
-                                                width: 40.0,
-                                              ),
-                                              Text(
-                                                "${_userController.records.last.accuracy}%",
-                                                style: TextStyle(
-                                                    color: ((int.parse(
-                                                                _userController
-                                                                    .records
-                                                                    .last
-                                                                    .accuracy)) <
-                                                            50
-                                                        ? Colors.red
-                                                        : Colors.green),
-                                                    fontSize: 18,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                            ],
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 12.0),
-                                            child: Row(
+                                        Expanded(
+                                            child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
+                                          children: [
+                                            Row(
                                               children: [
-                                                const Text(
-                                                  "WPM: ",
-                                                  style: TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      "Date ".toUpperCase(),
+                                                      style:
+                                                          GoogleFonts.poppins(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 20.0,
+                                                    ),
+                                                    Text(
+                                                      "Keystrokes: "
+                                                          .toUpperCase(),
+                                                      style:
+                                                          GoogleFonts.poppins(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 20.0,
+                                                    ),
+                                                    Text(
+                                                      "Accuracy: "
+                                                          .toUpperCase(),
+                                                      style:
+                                                          GoogleFonts.poppins(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 20.0,
+                                                    ),
+                                                    Text(
+                                                      "Correct Words: "
+                                                          .toUpperCase(),
+                                                      style:
+                                                          GoogleFonts.poppins(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 20.0,
+                                                    ),
+                                                  ],
                                                 ),
-                                                const SizedBox(
-                                                  width: 10.0,
+                                                SizedBox(
+                                                  width: 20.0,
                                                 ),
-                                                Text(
-                                                  //"${(_userController.records.last.score * 100) ~/ 40}%",
-                                                  _userController
-                                                      .records.last.wpm,
-                                                  style: TextStyle(
-                                                      fontSize: 18,
-                                                      fontWeight:
-                                                          FontWeight.bold),
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      //THis line will use to convert String of time into Date and Tme Format and then converting it into 2022-12-28 this format
+                                                      DateFormat('yyyy-MM-dd')
+                                                          .format(DateTime.parse(
+                                                              _userController
+                                                                  .records
+                                                                  .last
+                                                                  .time)),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 20.0,
+                                                    ),
+                                                    Text(
+                                                      //index hold the values of current element
+                                                      _userController.records
+                                                          .last.keyStrokes,
+                                                    ),
+                                                    SizedBox(
+                                                      width: 20.0,
+                                                    ),
+                                                    Text(
+                                                      "${_userController.records.last.accuracy}%",
+                                                      style: TextStyle(
+                                                          color: ((int.parse(
+                                                                      _userController
+                                                                          .records
+                                                                          .last
+                                                                          .accuracy)) <
+                                                                  50
+                                                              ? Colors.red
+                                                              : Colors.green),
+                                                          fontSize: 18,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 20.0,
+                                                    ),
+                                                    Text(
+                                                      //index hold the values of current element
+                                                      _userController.records
+                                                          .last.correctWords
+                                                          .toString(),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 20.0,
+                                                    ),
+                                                  ],
                                                 ),
                                               ],
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      children: [
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 12.0),
-                                          child: Row(
-                                            children: [
-                                              const Text(
-                                                "Correct Words: ",
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
+                                          ],
+                                        )),
+                                        Expanded(
+                                            child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      "Time ".toUpperCase(),
+                                                      style:
+                                                          GoogleFonts.poppins(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 20.0,
+                                                    ),
+                                                    Text(
+                                                      "Word Acc: "
+                                                          .toUpperCase(),
+                                                      style:
+                                                          GoogleFonts.poppins(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 20.0,
+                                                    ),
+                                                    Text(
+                                                      "WPM: ".toUpperCase(),
+                                                      style:
+                                                          GoogleFonts.poppins(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 20.0,
+                                                    ),
+                                                    Text(
+                                                      "Wrong words: "
+                                                          .toUpperCase(),
+                                                      style:
+                                                          GoogleFonts.poppins(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 20.0,
+                                                    ),
+                                                  ],
                                                 ),
-                                              ),
-                                              const SizedBox(
-                                                width: 40.0,
-                                              ),
-                                              Text(
-                                                //index hold the values of current element
-                                                _userController
-                                                    .records.last.correctWords
-                                                    .toString(),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 12.0),
-                                          child: Row(
-                                            children: [
-                                              const Text(
-                                                "Wrong words: ",
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
+                                                SizedBox(
+                                                  width: 20.0,
                                                 ),
-                                              ),
-                                              const SizedBox(
-                                                width: 40.0,
-                                              ),
-                                              Text(
-                                                //index hold the values of current element
-                                                _userController
-                                                    .records.last.wrongWords,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      "60 sec",
+                                                    ),
+                                                    SizedBox(
+                                                      width: 20.0,
+                                                    ),
+                                                    Text(
+                                                        //index hold the values of current element
+                                                        _userController.records
+                                                            .last.wordAccuracy),
+                                                    SizedBox(
+                                                      width: 20.0,
+                                                    ),
+                                                    Text(
+                                                      //"${(_userController.records.last.score * 100) ~/ 40}%",
+                                                      _userController
+                                                          .records.last.wpm,
+                                                      style: TextStyle(
+                                                          fontSize: 18,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 20.0,
+                                                    ),
+                                                    Text(
+                                                      //index hold the values of current element
+                                                      _userController.records
+                                                          .last.wrongWords,
+                                                    ),
+                                                    SizedBox(
+                                                      width: 20.0,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        )),
                                       ],
                                     ),
                                   ],
@@ -1189,7 +1265,7 @@ class _InteractionRowState extends State<InteractionRow> {
                             showGeneralDialog(
                               context: context,
                               pageBuilder: (ctx, a1, a2) {
-                                return Menu(context);
+                                return Menu(/*context*/);
                               },
                               transitionBuilder: (context, animation,
                                   secondaryAnimation, child) {
@@ -1334,6 +1410,7 @@ class _InteractionRowState extends State<InteractionRow> {
                         : const SizedBox(),
                     _userController.isGuest.value == false
                         ? IconButton(
+                            iconSize: 40,
                             icon: const Icon(
                               Icons.menu,
                               color: Colors.grey,
@@ -1342,7 +1419,7 @@ class _InteractionRowState extends State<InteractionRow> {
                               showGeneralDialog(
                                 context: context,
                                 pageBuilder: (ctx, a1, a2) {
-                                  return Menu(context);
+                                  return Menu(/*context*/);
                                 },
                                 transitionBuilder: (context, animation,
                                     secondaryAnimation, child) {

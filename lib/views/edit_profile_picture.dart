@@ -11,19 +11,18 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:tempo_application/controller/user_controller.dart';
 import 'package:tempo_application/main.dart';
-import 'package:tempo_application/views/add_background_image.dart';
 
 import '../model/user_model.dart';
 import '../widget/toast.dart';
 
-class AddProfilePic extends StatefulWidget {
-  const AddProfilePic({Key? key}) : super(key: key);
+class EditProfilePic extends StatefulWidget {
+  const EditProfilePic({Key? key}) : super(key: key);
 
   @override
-  _AddProfilePicState createState() => _AddProfilePicState();
+  _EditProfilePicState createState() => _EditProfilePicState();
 }
 
-class _AddProfilePicState extends State<AddProfilePic> {
+class _EditProfilePicState extends State<EditProfilePic> {
   final UserController _userController = Get.put(UserController());
   @override
   Widget build(BuildContext context) {
@@ -36,8 +35,6 @@ class _AddProfilePicState extends State<AddProfilePic> {
               alignment: Alignment.center,
               children: [
                 Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     SizedBox(
                       height: MediaQuery.of(context).padding.top,
@@ -46,7 +43,7 @@ class _AddProfilePicState extends State<AddProfilePic> {
                       height: 72.h,
                     ),
                     Text(
-                      'Your Account has been created'.toUpperCase(),
+                      'Edit your profile picture'.toUpperCase(),
                       style: TextStyle(fontSize: 5.sp),
                     ),
                     SizedBox(
@@ -81,17 +78,16 @@ class _AddProfilePicState extends State<AddProfilePic> {
                     SizedBox(
                       height: 46.h,
                     ),
-                    Text(
-                      'Welcome, ${_userController.loginUser.value.name}'
-                          .toUpperCase(),
+                    /*Text(
+                      'Welcome ${_userController.loginUser.value.name}!',
                       style: TextStyle(
-                          fontSize: 5.sp, fontWeight: FontWeight.w600),
-                    ),
-                    Text(
-                      'Upload a profile picture',
+                          fontSize: 6.sp, fontWeight: FontWeight.w700),
+                    ),*/
+                    /*Text(
+                      'Upload a new photo',
                       style: TextStyle(
                           fontSize: 4.sp, fontWeight: FontWeight.w200),
-                    ),
+                    ),*/
                     SizedBox(
                       height: 20.h,
                     ),
@@ -103,7 +99,7 @@ class _AddProfilePicState extends State<AddProfilePic> {
                           getImage(ImageSource.camera);
                         } else {
                           _userController.isGuest.value = false;
-                          Get.offAll(() => const AddBackgroundImage());
+                          Get.offAll(() => const MyApp());
                         }
                       },
                       child: Container(
@@ -118,7 +114,7 @@ class _AddProfilePicState extends State<AddProfilePic> {
                               ? 'Add a photo'.toUpperCase()
                               : 'Next'.toUpperCase(),
                           style: GoogleFonts.poppins(
-                              color: Colors.white, fontSize: 5.sp),
+                              color: Colors.white, fontSize: 4.sp),
                         ),
                       ),
                     ),
@@ -128,7 +124,7 @@ class _AddProfilePicState extends State<AddProfilePic> {
                     InkWell(
                       onTap: () {
                         _userController.isGuest.value = false;
-                        Get.offAll(() => const AddBackgroundImage());
+                        Get.offAll(() => const MyApp());
                       },
                       child: Container(
                         alignment: Alignment.center,
@@ -138,9 +134,9 @@ class _AddProfilePicState extends State<AddProfilePic> {
                             color: Color(0xff2F00F9),
                             borderRadius: BorderRadius.circular(10)),
                         child: Text(
-                          "Skip".toUpperCase(),
+                          "Not Now".toUpperCase(),
                           style: GoogleFonts.poppins(
-                              color: Colors.white, fontSize: 5.sp),
+                              color: Colors.white, fontSize: 4.sp),
                         ),
                       ),
                     )
